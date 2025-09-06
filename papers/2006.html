@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>UGC NET Political Science - 2006 Paper</title>
+<style>
+  body { font-family: Arial, sans-serif; background: #f4f6fb; margin: 0; padding: 20px; }
+  h1 { color: #1a237e; text-align: center; }
+  .quiz-container {
+    max-width: 700px;
+    margin: 0 auto;
+    background: #fff;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  }
+  #timer {
+    font-weight: bold;
+    color: red;
+    margin-bottom: 20px;
+    text-align: center;
+    font-size: 1.3em;
+  }
+  .question {
+    font-size: 1.2em;
+    margin-bottom: 15px;
+  }
+  .options {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .option-button {
+    background: #1a237e;
+    color: #fff;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1em;
+    text-align: left;
+    transition: background-color 0.3s;
+  }
+  .option-button:hover {
+    background: #3949ab;
+  }
+  .result {
+    margin-top: 15px;
+    font-weight: bold;
+    font-size: 1.2em;
+  }
+  button#restart {
+    display: none;
+    margin-top: 20px;
+    padding: 10px 20px;
+    background: #1a237e;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1em;
+  }
+  button#restart:hover {
+    background: #3949ab;
+  }
+  .hint {
+    margin-top: 10px;
+    color: #555;
+    display: none;
+    font-style: italic;
+  }
+</style>
+</head>
+<body>
+<div class="quiz-container">
+  <h1>UGC NET Political Science - 2006 Paper</h1>
+  <div id="timer">Time Left: <span id="time">05:00</span></div>
+
+  <div id="quiz-content">
+    <div id="question" class="question"></div>
+    <div id="options" class="options"></div>
+    <button onclick="showHint()" id="hint-btn">Show Hint</button>
+    <div id="hint" class="hint"></div>
+    <div id="result" class="result"></div>
+    <button id="restart" onclick="restartQuiz()">Restart Quiz</button>
+  </div>
+</div>
+
+<script>
+// ===== Full Question Bank (50 Questions 2006 Paper) =====
+const quizData = [
+  { question: "The thinker who accepted the fundamentals of Aristotle's political thought in the medieval period was:", options: ["John of Salisbury", "St. Thomas Aquinas", "Gregory I", "Alcuin"], answer: "St. Thomas Aquinas", hint: "Famous medieval Christian philosopher integrating Aristotle." },
+  { question: "Who said, 'Man is born free, but everywhere he is in chains'?", options: ["Locke", "Rousseau", "Marx", "Bentham"], answer: "Rousseau", hint: "From 'The Social Contract' (1762)." },
+  { question: "Match the books with their authors: The Politics, The Prince, The Social Contract, On Liberty.", options: ["(i) Aristotle, Machiavelli, Rousseau, J.S. Mill", "(ii) Aristotle, J.S. Mill, Rousseau, Machiavelli", "(iii) Rousseau, Mill, Aristotle, Machiavelli", "(iv) Machiavelli, Rousseau, Mill, Aristotle"], answer: "(i) Aristotle, Machiavelli, Rousseau, J.S. Mill", hint: "Classic political theory texts by famous thinkers." },
+  { question: "According to Aristotle, which is the best form of government?", options: ["Democracy", "Oligarchy", "Polity", "Tyranny"], answer: "Polity", hint: "A balanced government avoiding extremes." },
+  { question: "According to Locke, the functions of government are limited because it exists to protect:", options: ["Life, liberty, property", "Life and equality", "Liberty alone", "Property only"], answer: "Life, liberty, property", hint: "Natural rights are central to Locke." },
+  { question: "Match concepts with thinkers: General Will, Absolute Sovereignty, Limited Government, New Political Science.", options: ["Rousseau, Hobbes, Locke, Machiavelli", "Machiavelli, Locke, Rousseau, Hobbes", "Locke, Rousseau, Hobbes, Machiavelli", "Hobbes, Locke, Rousseau, Machiavelli"], answer: "Rousseau, Hobbes, Locke, Machiavelli", hint: "Major political philosophy concepts." },
+  { question: "According to Plato, the most inferior type of state is:", options: ["Democracy", "Oligarchy", "Tyranny", "Timocracy"], answer: "Tyranny", hint: "The worst deviation of justice in the state." },
+  { question: "According to Aristotle, the best polity is based on the principle of:", options: ["Democracy", "Oligarchy", "Mean", "Quantity and Quality"], answer: "Mean", hint: "Golden mean principle avoids extremes." },
+  { question: "Who among the following is categorized as an anarchist?", options: ["M.N. Roy", "Ambedkar", "Gandhi", "Jai Prakash"], answer: "M.N. Roy", hint: "Known for radical revolutionary ideas." },
+  { question: "Who examined liberal democracy from the angle of 'possessive individualism'?", options: ["J.J. Rousseau", "Anthony Down", "C.B. Macpherson", "Robert Dahl"], answer: "C.B. Macpherson", hint: "Canadian political theorist analyzing liberalism." },
+  { question: "Who launched the Bhoodan movement in India?", options: ["Jai Prakash Narayan", "Communist Party of India", "Acharya Vinoba Bhave", "Acharya Narendra Dev"], answer: "Acharya Vinoba Bhave", hint: "Land donation movement after independence." },
+  { question: "The author of 'Politics of Scarcity' is:", options: ["Paul Brass", "Myron Weiner", "Rajni Kothari", "Morris Jones"], answer: "Rajni Kothari", hint: "Political analyst focusing on Indian politics." },
+  { question: "In case of dispute between two Houses over an Ordinary Bill, it is referred to:", options: ["President of India", "Supreme Court", "Joint meeting of Houses", "Prime Minister"], answer: "Joint meeting of Houses", hint: "As per Indian Constitution procedure." },
+  { question: "Decisions on disqualification of Lok Sabha members are made by:", options: ["Minister for Parliamentary Affairs", "Speaker", "Committee on Privileges", "PM & Council of Ministers"], answer: "Speaker", hint: "Speaker has constitutional authority." },
+  { question: "The right to constitutional remedy is provided under:", options: ["Article 19", "Article 32", "Article 15", "Article 39"], answer: "Article 32", hint: "Called the 'heart of the Constitution' by Dr. Ambedkar." },
+  { question: "Which Fundamental Right incorporates abolition of untouchability?", options: ["Right to Freedom", "Right to Equality", "Right to Freedom of Religion", "Right against Exploitation"], answer: "Right to Equality", hint: "Article 17 abolishes untouchability." },
+  { question: "Which is NOT stipulated in the Constitution of India?", options: ["Election Commission", "Union Public Service Commission", "Indian National Congress", "Council of Ministers"], answer: "Indian National Congress", hint: "It is a political party, not a constitutional body." },
+  { question: "Sarkaria Commission was set up to review relations between:", options: ["President & PM", "Legislature & Executive", "Centre & States", "National & Regional parties"], answer: "Centre & States", hint: "Focus on Indian federalism." },
+  { question: "Nagar Palika Bill was first introduced during the PMship of:", options: ["Rajiv Gandhi", "Narasimha Rao", "VP Singh", "Indira Gandhi"], answer: "Indira Gandhi", hint: "Urban local governance reform." },
+  { question: "Which party has the highest percentage of MPs with criminal cases?", options: ["BJP", "Samajwadi Party", "RJD", "Congress"], answer: "Samajwadi Party", hint: "Based on election data." },
+  { question: "The scope of Comparative Politics includes study of:", options: ["Formal structures", "Political processes", "Extra-constitutional agencies", "All of the above"], answer: "All of the above", hint: "Comprehensive scope." },
+  { question: "The General Systems Theory in social sciences was first developed in:", options: ["Psychology, Anthropology, Political Science, Sociology", "Anthropology, Sociology, Psychology, Political Science", "Psychology, Sociology, Anthropology, Political Science", "Sociology, Psychology, Anthropology, Political Science"], answer: "Anthropology, Sociology, Psychology, Political Science", hint: "Chronological development of systems theory." },
+  { question: "According to Almond, input functions of a political system are:", options: ["Interest articulation & aggregation", "Rule-making & application", "All four: articulation, aggregation, rule-making, application", "None"], answer: "All four: articulation, aggregation, rule-making, application", hint: "Easton-Almond system model." },
+  { question: "Who defined modernization as 'a multifaceted process involving changes in all areas of human activity'?", options: ["Kenneth Organski", "Lucian Pye", "Almond & Powell", "Samuel Huntington"], answer: "Lucian Pye", hint: "Leading modernization theorist." },
+  { question: "A constitutional government is:", options: ["Limited government", "Government with constitution", "President-led government", "PM-led government"], answer: "Limited government", hint: "Rule of law limits state power." },
+  { question: "Who believed in the theory of circulation of elites?", options: ["Max Weber & Bottomore", "Pareto & Mosca", "Mills & Weber", "Michels & Croki"], answer: "Pareto & Mosca", hint: "Elite theory in political sociology." },
+  { question: "The most powerful legislature in the world is:", options: ["Indian Parliament", "UK Parliament", "US Congress", "French Parliament"], answer: "US Congress", hint: "Due to separation of powers and bicameral supremacy." },
+  { question: "Match political development concepts: Stages of development, crises, drosification of political culture, drosification of parties.", options: ["Almond & Verba, Organski, Lucian Pye, La Palombara & Myron Weiner", "Lucian Pye, Organski, Almond & Verba, La Palombara & Myron Weiner", "Organski, Lucian Pye, La Palombara, Almond & Verba", "La Palombara & Myron Weiner, Lucian Pye, Organski, Almond & Verba"], answer: "Almond & Verba, Organski, Lucian Pye, La Palombara & Myron Weiner", hint: "Classic studies in political development." },
+  { question: "The procedure established by law is characteristic of which judicial system?", options: ["USA", "UK", "India", "China"], answer: "India", hint: "Rule of law is central." },
+  { question: "Assertion: Supreme Court cannot declare a bad law invalid. Reason: Follows due process.", options: ["Both true & reason correct", "Both true & reason incorrect", "Assertion true, reason false", "Assertion false, reason true"], answer: "Assertion true, reason false", hint: "SC can declare law unconstitutional." },
+  { question: "Minnowbrook Conference took place in:", options: ["1963", "1969", "1970", "1972"], answer: "1963", hint: "Foundational Public Administration conference." },
+  { question: "First to emphasize separate study of Public Administration?", options: ["Frank J. Goodnow", "Woodrow Wilson", "D. Waldo", "Luther Gulick"], answer: "Woodrow Wilson", hint: "Father of Public Administration." },
+  { question: "Principles of Scientific Management (Taylor) include:", options: ["i, ii, iii", "i, ii, iv", "ii, iii, iv", "i, iii, iv"], answer: "i, ii, iv", hint: "Incentives, standardization, working conditions." },
+  { question: "Who propounded 14 principles of organization?", options: ["Henri Fayol", "J.D. Mooney", "L.D. White", "Dimock & Dimock"], answer: "Henri Fayol", hint: "Father of classical management theory." },
+  { question: "Who termed 'auxiliary function' as housekeeping function?", options: ["W.F. Willoughby", "L.D. White", "Pfiffner & Presthus", "Dimock & Dimock"], answer: "Pfiffner & Presthus", hint: "Auxiliary functions support administration." },
+  { question: "The word 'POSDCORB' was coined by:", options: ["Luther Gulick", "Marshal Dimock", "J.M. Pfiffner", "D. Waldo"], answer: "Luther Gulick", hint: "Planning, Organizing, Staffing..." },
+  { question: "Reforms in local government included:", options: ["Lord Ripon, Lord Mayo, Ashok Mehta, Balwant Rai Mehta", "Lord Mayo, Lord Ripon, Ashok Mehta, Balwant Rai Mehta", "Ashok Mehta, Lord Ripon, Lord Mayo, Balwant Rai Mehta", "Balwant Rai Mehta, Ashok Mehta, Lord Ripon, Lord Mayo"], answer: "Lord Ripon, Lord Mayo, Ashok Mehta, Balwant Rai Mehta", hint: "Chronology of Indian local government reforms." },
+  { question: "Which constitutional amendment introduced Panchayati Raj?", options: ["42nd", "44th", "73rd", "52nd"], answer: "73rd", hint: "Part IX of Constitution." },
+  { question: "Which schedule deals with Panchayats?", options: ["9th", "10th", "11th", "12th"], answer: "11th", hint: "Eleventh Schedule, Part IX." },
+  { question: "Who propounded the theory of democratic elitism?", options: ["Robert Dahl", "Joseph Schumpeter", "C.B. Macpherson", "Pareto"], answer: "Joseph Schumpeter", hint: "Elite theory in democracy." },
+  { question: "Who authored 'The Nature of Mass Political Opinion'?", options: ["Seymour Martin Lipset", "V.O. Key", "Gabriel Almond", "Robert Dahl"], answer: "V.O. Key", hint: "Classic work on public opinion." },
+  { question: "The concept of political culture was introduced by:", options: ["Gabriel Almond", "Sidney Verba", "Lucian Pye", "Almond & Verba"], answer: "Almond & Verba", hint: "Groundbreaking comparative politics study." },
+  { question: "The concept of 'Neo-institutionalism' is associated with:", options: ["March & Olsen", "North & Weingast", "Huntington", "Almond"], answer: "March & Olsen", hint: "Focus on formal and informal rules in politics." },
+  { question: "Who defined political development as 'change towards rationalization of authority and participation'?", options: ["Lucian Pye", "Almond & Verba", "Lipset", "Samuel Huntington"], answer: "Almond & Verba", hint: "Modernization perspective." },
+  { question: "The main theme of Huntington’s 'Political Order in Changing Societies' is:", options: ["Political decay", "Modernization", "Bureaucracy", "Military intervention"], answer: "Political decay", hint: "Order and stability in developing countries." },
+  { question: "Which thinker emphasized the 'responsible party government'?", options: ["Joseph Schumpeter", "E.E. Schattschneider", "Robert Michels", "Anthony Downs"], answer: "E.E. Schattschneider", hint: "Focus on party competition in democracy." },
+  { question: "Political system analysis was pioneered by:", options: ["David Easton", "Gabriel Almond", "Lucian Pye", "Robert Dahl"], answer: "David Easton", hint: "Framework for political system studies." },
+  { question: "The concept of 'Input-Output' model of political system is associated with:", options: ["Almond & Powell", "Easton", "Lipset", "Dahl"], answer: "Almond & Powell", hint: "Inputs like demands, outputs like policies." },
+  { question: "Who proposed the typology of political systems as ‘parliamentary, presidential, semi-presidential’?", options: ["Almond & Powell", "Linz", "Gabriel Almond", "Sartori"], answer: "Linz", hint: "Juan Linz’s classification." },
+  { question: "The main theme of Lipset’s study is:", options: ["Economic development and democracy", "Political culture", "Modernization", "Elite circulation"], answer: "Economic development and democracy", hint: "Classic link of wealth and democracy." },
+  { question: "The concept of ‘Political Legitimacy’ is central to:", options: ["Max Weber", "Karl Marx", "Hannah Arendt", "Pareto"], answer: "Max Weber", hint: "Weber’s types of authority." },
+  { question: "Which type of legitimacy is based on charisma?", options: ["Traditional", "Rational-legal", "Charismatic", "Structural"], answer: "Charismatic", hint: "Weberian authority types." },
+  { question: "The ‘Iron Law of Oligarchy’ was propounded by:", options: ["Michels", "Pareto", "Mosca", "Dahl"], answer: "Michels", hint: "Elite theory in party politics." },
+  { question: "The author of 'Political Order in Changing Societies' is:", options: ["Samuel Huntington", "Almond", "Lipset", "Weber"], answer: "Samuel Huntington", hint: "Focus on modernization and stability." },
+  { question: "The ‘developmental state’ concept is associated with:", options: ["Chalmers Johnson", "Weber", "Lipset", "Huntington"], answer: "Chalmers Johnson", hint: "East Asian state-led development." },
+  { question: "Which author analyzed democracy as ‘polyarchy’?", options: ["Robert Dahl", "Seymour Lipset", "Almond", "Linz"], answer: "Robert Dahl", hint: "Democracy as participation and contestation." }
+];
+
+// ===== Variables =====
+let currentIndex = 0;
+let score = 0;
+let timer;
+let time = 300; // 5 minutes
+
+const questionEl = document.getElementById('question');
+const optionsEl = document.getElementById('options');
+const hintEl = document.getElementById('hint');
+const resultEl = document.getElementById('result');
+const timerEl = document.getElementById('time');
+const hintBtn = document.getElementById('hint-btn');
+const restartBtn = document.getElementById('restart');
+
+// ===== Functions =====
+function loadQuestion() {
+  if (currentIndex >= quizData.length) {
+    endQuiz();
+    return;
+  }
+  resetState();
+
+  let currentQuestion = quizData[currentIndex];
+  questionEl.textContent = `Q${currentIndex + 1}: ${currentQuestion.question}`;
+  hintEl.style.display = "none";
+  hintEl.textContent = '';
+  resultEl.textContent = '';
+  hintBtn.style.display = 'inline-block';
+
+  currentQuestion.options.forEach(option => {
+    const button = document.createElement('button');
+    button.classList.add('option-button');
+    button.innerText = option;
+    button.onclick = () => selectAnswer(option);
+    optionsEl.appendChild(button);
+  });
+}
+
+function resetState() {
+  hintEl.style.display = 'none';
+  hintEl.textContent = '';
+  resultEl.textContent = '';
+  optionsEl.innerHTML = '';
+  hintBtn.disabled = false;
+}
+
+function selectAnswer(selected) {
+  let correctAnswer = quizData[currentIndex].answer;
+  if (selected === correctAnswer) {
+    resultEl.style.color = "green";
+    resultEl.textContent = "✅ Correct!";
+    score++;
+  } else {
+    resultEl.style.color = "red";
+    resultEl.textContent = `❌ Wrong! Correct Answer: ${correctAnswer}`;
+  }
+  hintBtn.disabled = true;
+  currentIndex++;
+  clearInterval(timer);
+  setTimeout(() => {
+    if(currentIndex < quizData.length) {
+      loadQuestion();
+      startTimer();
+    } else {
+      endQuiz();
+    }
+  }, 1500);
+}
+
+function showHint() {
+  hintEl.style.display = 'block';
+  hintEl.textContent = quizData[currentIndex].hint;
+  hintBtn.disabled = true;
+}
+
+function startTimer() {
+  clearInterval(timer);
+  time = 300;
+  updateTimerDisplay();
+  timer = setInterval(() => {
+    time--;
+    updateTimerDisplay();
+    if (time <= 0) {
+      clearInterval(timer);
+      endQuiz();
+    }
+  }, 1000);
+}
+
+function updateTimerDisplay() {
+  const minutes = Math.floor(time / 60).toString().padStart(2,'0');
+  const seconds = (time % 60).toString().padStart(2,'0');
+  timerEl.textContent = `${minutes}:${seconds}`;
+}
+
+function endQuiz() {
+  questionEl.textContent = `Quiz Completed! Score: ${score} out of ${quizData.length}`;
+  optionsEl.innerHTML = "";
+  hintEl.style.display = "none";
+  resultEl.textContent = '';
+  hintBtn.style.display = "none";
+  restartBtn.style.display = "inline-block";
+  timerEl.textContent = "00:00";
+}
+
+function restartQuiz() {
+  currentIndex = 0;
+  score = 0;
+  restartBtn.style.display = "none";
+  hintBtn.style.display = "inline-block";
+  loadQuestion();
+  startTimer();
+}
+
+// ===== Start Quiz =====
+loadQuestion();
+startTimer();
+</script>
+</body>
+</html>
