@@ -34,6 +34,137 @@ const allQuestions = [
     answer: 1,
     hint: "He wrote Politics."
   },
+  {
+    id: "math_pol_1",
+    year: 2024,
+    paper: "Paper 1 + Political Science",
+    question: "In a constituency with 50,000 voters, Party A received 45% votes, Party B received 30% votes, and Party C received 25% votes. If 20% of Party A's voters and 15% of Party B's voters switch to Party C in the next election, what percentage of votes will Party C receive?",
+    options: ["34%", "38%", "42%", "46%"],
+    answer: 2,
+    hint: "Calculate vote transfers: Party A loses 45% × 20% = 9%, Party B loses 30% × 15% = 4.5%",
+    explanation: "Party C originally had 25%. Gains: 9% + 4.5% = 13.5%. New total: 25% + 13.5% = 38.5% ≈ 38%"
+  },
+  
+  {
+    id: "reasoning_pol_1",
+    year: 2023,
+    paper: "Paper 1 Reasoning",
+    question: "If 'Democracy is to Majority Rule' as 'Autocracy is to X', then X is:",
+    options: ["Individual Rule", "Minority Rule", "Elite Rule", "Single Authority"],
+    answer: 3,
+    hint: "Consider the parallel relationship between governance systems and their power distribution",
+    explanation: "Democracy emphasizes majority rule, while autocracy concentrates power in a single authority or ruler"
+  },
+
+  {
+    id: "advanced_pol_1",
+    year: 2024,
+    paper: "Political Science Advanced",
+    question: "Which concept best explains the phenomenon where voters support policies that benefit society even when they personally bear the costs?",
+    options: ["Rational Choice Theory", "Social Choice Theory", "Public Interest Theory", "Collective Action Problem"],
+    answer: 2,
+    hint: "This relates to Arrow's impossibility theorem and collective decision-making",
+    explanation: "Social Choice Theory examines how individual preferences aggregate into collective decisions, including altruistic voting behavior"
+  },
+
+  {
+    id: "data_interpretation_1",
+    year: 2023,
+    paper: "Paper 1 Data Interpretation",
+    question: "A survey shows: 60% support Policy X, 40% support Policy Y, and 25% support both. What percentage supports neither policy?",
+    options: ["15%", "25%", "35%", "45%"],
+    answer: 1,
+    hint: "Use the principle of inclusion-exclusion: Total = X + Y - Both",
+    explanation: "Those supporting at least one policy: 60% + 40% - 25% = 75%. Therefore, 100% - 75% = 25% support neither"
+  },
+
+  {
+    id: "comparative_pol_1",
+    year: 2024,
+    paper: "Comparative Politics",
+    question: "The 'Third Wave of Democratization' (1974-1990) is most closely associated with which scholar's work?",
+    options: ["Francis Fukuyama", "Samuel Huntington", "Robert Dahl", "Larry Diamond"],
+    answer: 1,
+    hint: "This scholar identified three distinct waves of democratization in modern history",
+    explanation: "Samuel Huntington coined the term 'Third Wave' in his seminal work analyzing global democratization patterns"
+  },
+
+  {
+    id: "math_statistics_1",
+    year: 2023,
+    paper: "Paper 1 Statistics",
+    question: "In an opinion poll of 1000 respondents, the margin of error is ±3% at 95% confidence level. If 520 respondents favor a candidate, what is the confidence interval for the candidate's support?",
+    options: ["49%-55%", "50%-56%", "51%-57%", "52%-58%"],
+    answer: 0,
+    hint: "Convert 520/1000 to percentage first, then apply the margin of error",
+    explanation: "520/1000 = 52%. With ±3% margin of error: 52% - 3% = 49%, 52% + 3% = 55%"
+  },
+
+  {
+    id: "indian_polity_1",
+    year: 2024,
+    paper: "Indian Political System",
+    question: "Under which Article of the Indian Constitution can the President impose Financial Emergency?",
+    options: ["Article 352", "Article 356", "Article 360", "Article 368"],
+    answer: 2,
+    hint: "This emergency relates to the financial stability or credit of India",
+    explanation: "Article 360 deals with Financial Emergency, which can be imposed when the financial stability or credit of India is threatened"
+  },
+
+  {
+    id: "logical_reasoning_1",
+    year: 2023,
+    paper: "Paper 1 Logical Reasoning",
+    question: "All politicians are leaders. Some leaders are corrupt. Therefore:",
+    options: ["All politicians are corrupt", "Some politicians are corrupt", "No politicians are corrupt", "Cannot be determined"],
+    answer: 3,
+    hint: "Consider whether the given premises provide sufficient information for a definitive conclusion",
+    explanation: "The premises don't establish any direct relationship between politicians and corruption, making a definitive conclusion impossible"
+  },
+
+  {
+    id: "international_relations_1",
+    year: 2024,
+    paper: "International Relations",
+    question: "The concept of 'Balance of Power' in international relations is most fundamentally based on which assumption?",
+    options: ["States are rational actors", "Anarchy in the international system", "Economic interdependence", "Democratic peace theory"],
+    answer: 1,
+    hint: "Consider what structural condition makes power balancing necessary in international politics",
+    explanation: "Anarchy (absence of world government) creates the security dilemma that necessitates balance of power mechanisms"
+  },
+
+  {
+    id: "research_methodology_1",
+    year: 2023,
+    paper: "Research Methodology",
+    question: "In hypothesis testing, a Type II error occurs when:",
+    options: ["We reject a true null hypothesis", "We accept a false null hypothesis", "Sample size is too small", "Data is not normally distributed"],
+    answer: 1,
+    hint: "Type II error is also known as 'false negative' - missing something that's actually there",
+    explanation: "Type II error (β error) occurs when we fail to reject a false null hypothesis, missing a real effect"
+  },
+
+  {
+    id: "political_theory_advanced_1",
+    year: 2024,
+    paper: "Political Theory Advanced",
+    question: "John Rawls' 'difference principle' would justify inequality only if it:",
+    options: ["Maximizes overall utility", "Benefits the worst-off members", "Maintains equal opportunity", "Preserves individual liberty"],
+    answer: 1,
+    hint: "Rawls was particularly concerned with justice for the least advantaged in society",
+    explanation: "The difference principle permits inequalities only if they work to the benefit of the least advantaged members of society"
+  },
+
+  {
+    id: "comprehension_analysis_1",
+    year: 2023,
+    paper: "Paper 1 Reading Comprehension",
+    question: "The passage states that 'democratic consolidation requires both institutional and cultural changes.' This implies that:",
+    options: ["Institutions alone ensure democracy", "Culture is more important than institutions", "Both formal and informal factors matter", "Economic development is prerequisite"],
+    answer: 2,
+    hint: "The word 'both' indicates equal importance of different types of factors",
+    explanation: "The statement emphasizes that successful democratization needs both formal institutional structures and informal cultural adaptations"
+  }
     {
     "id": "q2024_001",
     "year": 2024,
