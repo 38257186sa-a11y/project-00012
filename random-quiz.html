@@ -1,46 +1,40 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>UGC NET Political Science - Random Quiz</title>
-  <style>
-    body { font-family: Arial, sans-serif; background: #f4f6fb; margin:0; padding:20px; }
-    h1 { text-align: center; color: #1a237e; }
-    .question-box { background: #fff; padding:20px; border-radius:8px; margin-bottom:20px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-    .options label { display:block; margin:8px 0; cursor:pointer; }
-    button { background:#1a237e; color:#fff; padding:10px 20px; border:none; border-radius:5px; cursor:pointer; margin-top:10px; }
-    button:hover { background:#3949ab; }
-    .hint { margin-top:10px; color:#555; display:none; }
-    #timer { font-weight:bold; color:red; margin-bottom:20px; text-align:center; }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>UGC NET Political Science - Random Quiz</title>
+<style>
+body { font-family: Arial, sans-serif; background: #f4f6fb; margin:0; padding:20px; }
+h1 { text-align: center; color: #1a237e; }
+.question-box { background: #fff; padding:20px; border-radius:8px; margin-bottom:20px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+.options label { display:block; margin:8px 0; cursor:pointer; }
+button { background:#1a237e; color:#fff; padding:10px 20px; border:none; border-radius:5px; cursor:pointer; margin-top:10px; }
+button:hover { background:#3949ab; }
+.hint { margin-top:10px; color:#555; display:none; }
+#timer { font-weight:bold; color:red; margin-bottom:20px; text-align:center; }
+</style>
 </head>
 <body>
-  <h1>Random Quiz - Political Science</h1>
-  <div id="timer">Time Left: <span id="time">30:00</span></div>
-  <div id="quiz-container"></div>
-  <button onclick="nextBatch()">Next Batch (29 Questions)</button>
-  <button onclick="refreshQuiz()">🔄 Refresh Quiz</button>
+<h1>Random Quiz - Political Science</h1>
+<div id="timer">Time Left: <span id="time">30:00</span></div>
+<div id="quiz-container"></div>
+<button onclick="nextBatch()">Next Batch (29 Questions)</button>
+<button onclick="refreshQuiz()">🔄 Refresh Quiz</button>
 
-  <script>
-    // ===================== QUESTIONS =====================
-    // Add or update questions directly here
-    const allQuestions = [
-      { id:"q1", year:2004, question:"Who is regarded as the father of political science?", options:["Plato","Aristotle","Machiavelli","Socrates"], answer:1, hint:"He wrote Politics." },
-      { id:"q2", year:2004, question:"Which thinker introduced the concept of 'Leviathan'?", options:["Locke","Rousseau","Hobbes","Bentham"], answer:2, hint:"He believed in social contract and strong sovereign." },
-      { id:"q3", year:2005, question:"The concept of 'Hegemony' was elaborated by?", options:["Karl Marx","Max Weber","Antonio Gramsci","David Easton"], answer:2, hint:"Italian Marxist, wrote Prison Notebooks." },
-      { id:"q4", year:2005, question:"Who wrote 'The Social Contract'?", options:["Rousseau","Locke","Hobbes","Machiavelli"], answer:0, hint:"He emphasized general will." },
-      { id:"q5", year:2006, question:"Who introduced concept of 'Power Elite'?", options:["C. Wright Mills","Max Weber","Parsons","Dahl"], answer:0, hint:"American sociologist, 1956." },
-      {
-    id: "q2",
-    year: 2004,
-    question: "Which thinker introduced the concept of 'Leviathan'?",
-    options: ["Locke", "Rousseau", "Hobbes", "Bentham"],
-    answer: 2,
-    hint: "He believed in social contract and strong sovereign."
-  },
-
+<script>
+// ===================== QUESTIONS =====================
+const allQuestions = [
+  // ======= Sample Questions =======
   {
+    id: "sample1",
+    year: 2004,
+    question: "Who is regarded as the father of political science?",
+    options: ["Plato","Aristotle","Machiavelli","Socrates"],
+    answer: 1,
+    hint: "He wrote Politics."
+  },
+    {
     "id": "q2024_001",
     "year": 2024,
     "question": "Who is considered the father of modern psychology?",
@@ -96,8 +90,6 @@
     "question": "The Green Revolution in India was initiated during which decade?",
     "options": ["1950s", "1960s", "1970s", "1980s"],
     "answer": 1,
-    "hint": "Enacted in 1988 to expand democratic participation.",
-    "subject": "Political Science",
     "source": "papers/2024_voting_rights.html"
   },
   {
@@ -238,99 +230,113 @@
     answer: 2,
     hint: "Italian Marxist, wrote Prison Notebooks."
   }
-      { id:"q6", year:2006, question:"Which thinker developed 'Pluralist Theory'?", options:["Dahl","Marx","Michels","Hobbes"], answer:0, hint:"Robert Dahl, 1961." },
-      { id:"q7", year:2007, question:"Who authored 'Politics as a Vocation'?", options:["Weber","Parsons","Easton","Lasswell"], answer:0, hint:"Max Weber, German sociologist." },
-      { id:"q8", year:2007, question:"Which theory emphasizes 'social contract'?", options:["Liberalism","Marxism","Realism","Constructivism"], answer:0, hint:"Philosophers: Hobbes, Locke, Rousseau." },
-      { id:"q9", year:2008, question:"Who wrote 'Democracy in America'?", options:["Alexis de Tocqueville","Bentham","Machiavelli","Rousseau"], answer:0, hint:"French political thinker, 1835." },
-      { id:"q10", year:2008, question:"Which is core idea of Machiavelli's 'The Prince'?", options:["Virtue ethics","Power and pragmatism","Justice","Liberty"], answer:1, hint:"Focus on political realism." }
-      // You can add more questions here: q11, q12, etc.
-    ];
+  {
+    id: "sample2",
+    year: 2005,
+    question: "Which thinker introduced the concept of 'Leviathan'?",
+    options: ["Locke","Rousseau","Hobbes","Bentham"],
+    answer: 2,
+    hint: "He believed in social contract and strong sovereign."
+  }
+];
 
-    // ===================== QUIZ LOGIC =====================
-    let usedQuestions = new Set();
-    const batchSize = 29;
-    let timerInterval;
+// ======= Placeholder Questions (998) =======
+for(let i=1;i<=998;i++){
+  allQuestions.push({
+    id: "q"+i,
+    year: 2004 + (i % 22), // cycles from 2004-2025
+    question: "Question placeholder #" + i,
+    options: ["Option A","Option B","Option C","Option D"],
+    answer: 0, // default correct option, editable
+    hint: "Hint for question #" + i
+  });
+}
 
-    function startQuiz() {
-      document.getElementById("quiz-container").innerHTML = "";
-      const selected = [];
-      while (selected.length < batchSize && usedQuestions.size < allQuestions.length) {
-        const q = allQuestions[Math.floor(Math.random() * allQuestions.length)];
-        if (!usedQuestions.has(q.id)) {
-          usedQuestions.add(q.id);
-          selected.push(q);
-        }
-      }
-      renderQuestions(selected);
-      startTimer(1800); // 30 mins
+// ===================== QUIZ LOGIC =====================
+let usedQuestions = new Set();
+const batchSize = 29;
+let timerInterval;
+
+function startQuiz() {
+  document.getElementById("quiz-container").innerHTML = "";
+  const selected = [];
+  while(selected.length < batchSize && usedQuestions.size < allQuestions.length){
+    const q = allQuestions[Math.floor(Math.random()*allQuestions.length)];
+    if(!usedQuestions.has(q.id)){
+      usedQuestions.add(q.id);
+      selected.push(q);
     }
+  }
+  renderQuestions(selected);
+  startTimer(1800); // 30 mins
+}
 
-    function renderQuestions(questions){
-      const container = document.getElementById("quiz-container");
-      questions.forEach((q,index)=>{
-        const box = document.createElement("div");
-        box.className="question-box";
-        box.innerHTML=`
-          <p><b>Q${index+1}:</b> ${q.question}</p>
-          ${q.options.map((opt,i)=>`<label><input type="radio" name="${q.id}" value="${i}"> ${opt}</label>`).join("")}
-          <button onclick="checkAnswer('${q.id}',${q.answer})">Submit</button>
-          <button onclick="showHint('${q.id}')">Hint</button>
-          <p id="hint_${q.id}" class="hint">${q.hint}</p>
-          <p id="result_${q.id}"></p>
-        `;
-        container.appendChild(box);
-      });
-    }
+function renderQuestions(questions){
+  const container = document.getElementById("quiz-container");
+  questions.forEach((q,index)=>{
+    const box = document.createElement("div");
+    box.className="question-box";
+    box.innerHTML=`
+      <p><b>Q${index+1}:</b> ${q.question}</p>
+      ${q.options.map((opt,i)=>`<label><input type="radio" name="${q.id}" value="${i}"> ${opt}</label>`).join("")}
+      <button onclick="checkAnswer('${q.id}',${q.answer})">Submit</button>
+      <button onclick="showHint('${q.id}')">Hint</button>
+      <p id="hint_${q.id}" class="hint">${q.hint}</p>
+      <p id="result_${q.id}"></p>
+    `;
+    container.appendChild(box);
+  });
+}
 
-    function checkAnswer(qId, correct){
-      const selected = document.querySelector(`input[name="${qId}"]:checked`);
-      if(!selected){ alert("Please select an answer."); return; }
-      const result = document.getElementById("result_"+qId);
-      if(parseInt(selected.value) === correct){
-        result.textContent = "✅ Correct!";
-        result.style.color = "green";
-      } else {
-        result.textContent = "❌ Wrong! Correct: " + allQuestions.find(q=>q.id===qId).options[correct];
-        result.style.color = "red";
-      }
-    }
+function checkAnswer(qId, correct){
+  const selected = document.querySelector(`input[name="${qId}"]:checked`);
+  if(!selected){ alert("Please select an answer."); return; }
+  const result = document.getElementById("result_"+qId);
+  if(parseInt(selected.value)===correct){
+    result.textContent="✅ Correct!";
+    result.style.color="green";
+  } else {
+    result.textContent="❌ Wrong! Correct: "+allQuestions.find(q=>q.id===qId).options[correct];
+    result.style.color="red";
+  }
+}
 
-    function showHint(qId){
-      document.getElementById("hint_"+qId).style.display = "block";
-    }
+function showHint(qId){
+  document.getElementById("hint_"+qId).style.display="block";
+}
 
-    function nextBatch(){
-      if(usedQuestions.size >= allQuestions.length){
-        alert("🎉 You completed all questions!");
-        return;
-      }
-      startQuiz();
-    }
+function nextBatch(){
+  if(usedQuestions.size >= allQuestions.length){
+    alert("🎉 You completed all questions!");
+    return;
+  }
+  startQuiz();
+}
 
-    function refreshQuiz(){
-      usedQuestions.clear();
-      startQuiz();
-    }
+function refreshQuiz(){
+  usedQuestions.clear();
+  startQuiz();
+}
 
-    function startTimer(seconds){
+function startTimer(seconds){
+  clearInterval(timerInterval);
+  let timeLeft = seconds;
+  const timerElement = document.getElementById("time");
+  timerInterval = setInterval(()=>{
+    if(timeLeft>0){
+      timeLeft--;
+      const min = Math.floor(timeLeft/60);
+      const sec = timeLeft%60;
+      timerElement.textContent=`${String(min).padStart(2,"0")}:${String(sec).padStart(2,"0")}`;
+    } else {
       clearInterval(timerInterval);
-      let timeLeft = seconds;
-      const timerElement = document.getElementById("time");
-      timerInterval = setInterval(()=>{
-        if(timeLeft>0){
-          timeLeft--;
-          const min = Math.floor(timeLeft/60);
-          const sec = timeLeft%60;
-          timerElement.textContent=`${String(min).padStart(2,"0")}:${String(sec).padStart(2,"0")}`;
-        } else {
-          clearInterval(timerInterval);
-          alert("⏰ Time's up!");
-        }
-      },1000);
+      alert("⏰ Time's up!");
     }
+  },1000);
+}
 
-    // Initialize quiz on page load
-    startQuiz();
-  </script>
+// Initialize quiz on page load
+startQuiz();
+</script>
 </body>
 </html>
