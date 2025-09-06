@@ -13,32 +13,43 @@
     button:hover { background: #3949ab; }
     .hint { margin-top: 10px; color: #555; display: none; }
     #timer { font-weight: bold; color: red; margin-bottom: 20px; text-align: center; }
+    #controls { text-align: center; margin: 20px; }
   </style>
 </head>
 <body>
   <h1>Random Quiz - 1000 Questions</h1>
   <div id="timer">Time Left: <span id="time">30:00</span></div>
   <div id="quiz-container"></div>
-  <button onclick="nextBatch()">Next Batch (29 Questions)</button>
-  <button onclick="refreshQuiz()">🔄 Refresh</button>
+
+  <div id="controls">
+    <button onclick="nextBatch()">Next Batch (29 Questions)</button>
+    <button onclick="refreshQuiz()">🔄 Refresh</button>
+  </div>
 
   <script>
     let allQuestions = [];
     let usedQuestions = new Set();
-    let batchSize = 29;
+    const batchSize = 29;
     let timerInterval;
 
-    // Load questions from JSON
+    // Load questions from JSON file
     async function loadQuestions() {
-      const res = await fetch("questions_pool.json");
-      allQuestions = await res.json();
-      startQuiz();
+      try {
+        const res = await fetch("questions_pool.json");
+        if (!res.ok) throw new Error("Failed to load questions");
+        allQuestions = await res.json();
+        startQuiz();
+      } catch (err) {
+        document.getElementById("quiz-container").innerHTML = 
+          `<p style="color:red;">❌ Error: Could not load questions_pool.json. Please check file path.</p>`;
+      }
     }
 
-    // Start Quiz
+    // Start a new batch
     function startQuiz() {
       document.getElementById("quiz-container").innerHTML = "";
       const selected = [];
+
       while (selected.length < batchSize && usedQuestions.size < allQuestions.length) {
         let q = allQuestions[Math.floor(Math.random() * allQuestions.length)];
         if (!usedQuestions.has(q.id)) {
@@ -46,11 +57,17 @@
           selected.push(q);
         }
       }
+
+      if (selected.length === 0) {
+        document.getElementById("quiz-container").innerHTML = "<p>🎉 You have attempted all 1000 questions!</p>";
+        return;
+      }
+
       renderQuestions(selected);
-      startTimer(1800); // 30 mins
+      startTimer(1800); // 30 minutes
     }
 
-    // Render
+    // Render questions
     function renderQuestions(questions) {
       const container = document.getElementById("quiz-container");
       questions.forEach((q, index) => {
@@ -73,6 +90,7 @@
       clearInterval(timerInterval);
       let timeLeft = seconds;
       const timerElement = document.getElementById("time");
+
       timerInterval = setInterval(() => {
         if (timeLeft > 0) {
           timeLeft--;
@@ -114,7 +132,7 @@
       startQuiz();
     }
 
-    // Refresh
+    // Refresh quiz
     function refreshQuiz() {
       usedQuestions.clear();
       startQuiz();
