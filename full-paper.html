@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>UGC NET Political Science - Complete Papers</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0; padding: 0;
+      background: #f4f6fb;
+      color: #222;
+    }
+    header {
+      background: #1a237e;
+      color: #fff;
+      padding: 20px;
+      text-align: center;
+    }
+    h1 { margin: 0; }
+    .container {
+      max-width: 800px;
+      margin: 30px auto;
+      padding: 20px;
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+    label {
+      font-weight: bold;
+      color: #1a237e;
+    }
+    select {
+      width: 100%;
+      padding: 12px;
+      margin-top: 10px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      font-size: 16px;
+    }
+    button {
+      margin-top: 20px;
+      background: #1a237e;
+      color: #fff;
+      padding: 12px 20px;
+      border: none;
+      border-radius: 6px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+    button:hover {
+      background: #3949ab;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>UGC NET Political Science - Complete Question Papers</h1>
+    <p>Select a Year (2004–2025) to start practice</p>
+  </header>
+
+  <div class="container">
+    <label for="yearSelect">Choose Year:</label>
+    <select id="yearSelect">
+      <option value="">-- Select Year --</option>
+      <!-- Auto list from 2004 to 2025 -->
+      <script>
+        for (let year = 2004; year <= 2025; year++) {
+          document.write(`<option value="${year}">${year}</option>`);
+        }
+      </script>
+    </select>
+
+    <button onclick="openPaper()">Start Paper</button>
+  </div>
+
+  <script>
+    function openPaper() {
+      const year = document.getElementById("yearSelect").value;
+      if (year) {
+        // Redirect to year-wise quiz file
+        window.location.href = `papers/${year}.html`;
+      } else {
+        alert("Please select a year first.");
+      }
+    }
+  </script>
+</body>
+</html>
