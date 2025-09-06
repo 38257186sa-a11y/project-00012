@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>UGC NET Political Science - 2006 Paper</title>
+<style>
+  body { font-family: Arial, sans-serif; background: #f4f6fb; margin: 0; padding: 20px; }
+  h1 { color: #1a237e; text-align: center; }
+  .quiz-container {
+    max-width: 700px;
+    margin: 0 auto;
+    background: #fff;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  }
+  #timer {
+    font-weight: bold;
+    color: red;
+    margin-bottom: 20px;
+    text-align: center;
+    font-size: 1.3em;
+  }
+  .question {
+    font-size: 1.2em;
+    margin-bottom: 15px;
+  }
+  .options {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .option-button {
+    background: #1a237e;
+    color: #fff;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1em;
+    text-align: left;
+    transition: background-color 0.3s;
+  }
+  .option-button:hover {
+    background: #3949ab;
+  }
+  .result {
+    margin-top: 15px;
+    font-weight: bold;
+    font-size: 1.2em;
+  }
+  button#restart {
+    display: none;
+    margin-top: 20px;
+    padding: 10px 20px;
+    background: #1a237e;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1em;
+  }
+  button#restart:hover {
+    background: #3949ab;
+  }
+  .hint {
+    margin-top: 10px;
+    color: #555;
+    display: none;
+    font-style: italic;
+  }
+</style>
+</head>
+<body>
+<div class="quiz-container">
+  <h1>UGC NET Political Science - 2006 Paper</h1>
+  <div id="timer">Time Left: <span id="time">05:00</span></div>
+
+  <div id="quiz-content">
+    <div id="question" class="question"></div>
+    <div id="options" class="options"></div>
+    <button onclick="showHint()" id="hint-btn">Show Hint</button>
+    <div id="hint" class="hint"></div>
+    <div id="result" class="result"></div>
+    <button id="restart" onclick="restartQuiz()">Restart Quiz</button>
+  </div>
+</div>
+
+<script>
+// ===== Sample Question Bank (2006 Paper style) =====
+const quizData = [
+  {
+    question: "Who defined democracy as ‘a government in which everyone has a share’?",
+    options: ["Plato", "Aristotle", "Lincoln", "Bentham"],
+    answer: "Aristotle",
+    hint: "He gave the classical definition in 'Politics'."
+  },
+  {
+    question: "The concept of 'Sovereignty' was systematically developed by:",
+    options: ["Jean Bodin", "Rousseau", "Austin", "Laski"],
+    answer: "Jean Bodin",
+    hint: "French thinker, 16th century, father of modern sovereignty."
+  },
+  {
+    question: "Who said ‘Man is born free, but everywhere he is in chains’?",
+    options: ["Locke", "Rousseau", "Hobbes", "Marx"],
+    answer: "Rousseau",
+    hint: "Appears in the opening line of 'The Social Contract' (1762)."
+  },
+  {
+    question: "The term 'Directive Principles of State Policy' in the Indian Constitution has been borrowed from:",
+    options: ["UK", "Ireland", "USA", "Canada"],
+    answer: "Ireland",
+    hint: "Inspired by the Irish Constitution of 1937."
+  },
+  {
+    question: "In India, the concept of ‘Fundamental Duties’ was added through:",
+    options: ["42nd Amendment, 1976", "44th Amendment, 1978", "52nd Amendment, 1985", "73rd Amendment, 1992"],
+    answer: "42nd Amendment, 1976",
+    hint: "Introduced during the Emergency under Indira Gandhi."
+  }
+];
+
+// ===== Variables =====
+let currentIndex = 0;
+let score = 0;
+let timer;
+let time = 300; // 5 minutes
+
+const questionEl = document.getElementById('question');
+const optionsEl = document.getElementById('options');
+const hintEl = document.getElementById('hint');
+const resultEl = document.getElementById('result');
+const timerEl = document.getElementById('time');
+const hintBtn = document.getElementById('hint-btn');
+const restartBtn = document.getElementById('restart');
+
+// ===== Functions =====
+function loadQuestion() {
+  if (currentIndex >= quizData.length) {
+    endQuiz();
+    return;
+  }
+  resetState();
+
+  let currentQuestion = quizData[currentIndex];
+  questionEl.textContent = `Q${currentIndex + 1}: ${currentQuestion.question}`;
+  hintEl.style.display = "none";
+  hintEl.textContent = '';
+  resultEl.textContent = '';
+  hintBtn.style.display = 'inline-block';
+
+  currentQuestion.options.forEach(option => {
+    const button = document.createElement('button');
+    button.classList.add('option-button');
+    button.innerText = option;
+    button.onclick = () => selectAnswer(option);
+    optionsEl.appendChild(button);
+  });
+}
+
+function resetState() {
+  hintEl.style.display = 'none';
+  hintEl.textContent = '';
+  resultEl.textContent = '';
+  optionsEl.innerHTML = '';
+  hintBtn.disabled = false;
+}
+
+function selectAnswer(selected) {
+  let correctAnswer = quizData[currentIndex].answer;
+  if (selected === correctAnswer) {
+    resultEl.style.color = "green";
+    resultEl.textContent = "✅ Correct!";
+    score++;
+  } else {
+    resultEl.style.color = "red";
+    resultEl.textContent = `❌ Wrong! Correct Answer: ${correctAnswer}`;
+  }
+  hintBtn.disabled = true;
+  currentIndex++;
+  clearInterval(timer);
+  setTimeout(() => {
+    if(currentIndex < quizData.length) {
+      loadQuestion();
+      startTimer();
+    } else {
+      endQuiz();
+    }
+  }, 1500);
+}
+
+function showHint() {
+  hintEl.style.display = 'block';
+  hintEl.textContent = quizData[currentIndex].hint;
+  hintBtn.disabled = true;
+}
+
+function startTimer() {
+  clearInterval(timer);
+  time = 300;
+  updateTimerDisplay();
+  timer = setInterval(() => {
+    time--;
+    updateTimerDisplay();
+    if (time <= 0) {
+      clearInterval(timer);
+      endQuiz();
+    }
+  }, 1000);
+}
+
+function updateTimerDisplay() {
+  const minutes = Math.floor(time / 60).toString().padStart(2,'0');
+  const seconds = (time % 60).toString().padStart(2,'0');
+  timerEl.textContent = `${minutes}:${seconds}`;
+}
+
+function endQuiz() {
+  questionEl.textContent = `Quiz Completed! Score: ${score} out of ${quizData.length}`;
+  optionsEl.innerHTML = "";
+  hintEl.style.display = "none";
+  resultEl.textContent = '';
+  hintBtn.style.display = "none";
+  restartBtn.style.display = "inline-block";
+  timerEl.textContent = "00:00";
+}
+
+function restartQuiz() {
+  currentIndex = 0;
+  score = 0;
+  restartBtn.style.display = "none";
+  hintBtn.style.display = "inline-block";
+  loadQuestion();
+  startTimer();
+}
+
+// ===== Start Quiz =====
+loadQuestion();
+startTimer();
+</script>
+</body>
+</html>
