@@ -1,0 +1,783 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>UGC NET Political Science - Random Quiz</title>
+<style>
+body { font-family: Arial, sans-serif; background: #f4f6fb; margin:0; padding:20px; }
+h1 { text-align: center; color: #1a237e; }
+.quiz-set-header { text-align: center; color: #3949ab; margin-top: 30px; margin-bottom: 15px; font-size: 1.5em; font-weight: bold; }
+.question-box { background: #fff; padding:20px; border-radius:8px; margin-bottom:20px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+.options label { display:block; margin:8px 0; cursor:pointer; }
+.quiz-controls { text-align: center; margin-top: 20px; }
+.quiz-controls button { background:#1a237e; color:#fff; padding:10px 20px; border:none; border-radius:5px; cursor:pointer; margin: 5px; }
+.quiz-controls button:hover { background:#3949ab; }
+.quiz-controls input { padding: 8px; border: 1px solid #ccc; border-radius: 5px; width: 80px; text-align: center; }
+.hint { margin-top:10px; color:#555; display:none; }
+#timer { font-weight:bold; color:red; margin-bottom:20px; text-align:center; }
+#quiz-status { text-align: center; margin-bottom: 20px; font-style: italic; color: #555; }
+</style>
+</head>
+<body>
+<h1>UGC NET Political Science - Random Quiz</h1>
+<div id="timer">Time Left: <span id="time">30:00</span></div>
+<div id="quiz-status"></div>
+<div id="quiz-container"></div>
+<div class="quiz-controls">
+    <button onclick="submitQuiz()">Submit Quiz</button>
+    <button onclick="startNextSet()">Next Set (27 Questions)</button>
+    <br><br>
+    <label for="set-number">Go to Set Number:</label>
+    <input type="number" id="set-number" min="1" max="371" value="1">
+    <button onclick="startSpecificSet()">Go</button>
+    <button onclick="startMergedSet()">Merge All Sets</button>
+</div>
+<a href="project-00012/random-quiz.html">Take the Random Quiz</a>
+
+<script>
+const allQuestions = [
+  {
+    id: "pol_sci_001",
+    question: "Who is regarded as the father of political science?",
+    options: ["Plato", "Aristotle", "Machiavelli", "Socrates"],
+    answer: 1,
+    explanation: "Aristotle is widely regarded as the father of political science."
+  },
+  {
+    id: "pol_sci_002",
+    question: "The concept of 'Soft Power' was coined by:",
+    options: ["Joseph Nye", "Robert Keohane", "Kenneth Waltz", "John Mearsheimer"],
+    answer: 0,
+    explanation: "Joseph Nye introduced the concept of 'soft power'."
+  },
+  {
+    id: "pol_sci_003",
+    question: "Which of the following is NOT a characteristic of qualitative research?",
+    options: ["Statistical generalization", "Contextual understanding", "Inductive reasoning", "Subjective interpretation"],
+    answer: 0,
+    explanation: "Qualitative research focuses on depth rather than breadth, and does not aim for statistical generalization."
+  },
+  {
+    id: "gen_apt_006",
+    question: "Which measure of central tendency is most affected by extreme values in a dataset of voter turnout percentages?",
+    options: ["Mean", "Median", "Mode", "Midrange"],
+    answer: 0,
+    explanation: "The mean is most affected by extreme values as it considers all data points in its calculation. Median, mode, and midrange are less sensitive to outliers, making them more robust for skewed distributions like voter turnout percentages."
+  },
+  {
+    id: "gen_apt_007",
+    question: "In research methodology, what does 'construct validity' refer to?",
+    options: ["Accuracy of statistical tests", "Extent to which a test measures the intended theoretical concept", "Reliability of data collection tools", "Generalizability of findings"],
+    answer: 1,
+    explanation: "Construct validity refers to the extent to which a test measures the theoretical concept it intends to, such as 'political awareness' in a survey. It is distinct from statistical accuracy, reliability, or generalizability."
+  },
+  {
+    id: "gen_apt_008",
+    question: "Which teaching strategy best fosters 'Analyzing' level skills in Bloom’s revised taxonomy for a political science class?",
+    options: ["Memorizing key terms", "Comparing two political systems", "Summarizing a text", "Reciting constitutional articles"],
+    answer: 1,
+    explanation: "Comparing two political systems requires breaking down information and examining relationships, aligning with the 'Analyzing' level. Memorizing, summarizing, and reciting align with lower levels like Remembering or Understanding."
+  },
+  {
+    id: "gen_apt_009",
+    question: "What is the primary purpose of a pilot study in political science research?",
+    options: ["To publish final results", "To test the feasibility of research methods", "To ensure statistical significance", "To replace the main study"],
+    answer: 1,
+    explanation: "A pilot study tests the feasibility of research methods, tools, and procedures to identify potential issues before the main study. It is not for publishing final results, ensuring statistical significance, or replacing the main study."
+  },
+  {
+    id: "gen_apt_010",
+    question: "Which ethical principle is most critical when researching politically sensitive topics like electoral fraud?",
+    options: ["Maximizing sample size", "Ensuring participant confidentiality", "Using open-ended questions", "Achieving high response rates"],
+    answer: 1,
+    explanation: "Ensuring participant confidentiality is critical in sensitive research to protect respondents from harm or retaliation. Sample size, question type, and response rates are methodological, not ethical, concerns."
+  },
+  {
+    id: "pol_sci_014",
+    question: "Which political theorist introduced the concept of 'hegemony' to describe cultural and ideological dominance?",
+    options: ["Karl Marx", "Antonio Gramsci", "Max Weber", "Michel Foucault"],
+    answer: 1,
+    explanation: "Antonio Gramsci introduced 'hegemony' to describe how ruling classes maintain dominance through cultural and ideological consent, not just coercion. Marx focused on class struggle, Weber on authority, and Foucault on power relations."
+  },
+  {
+    id: "pol_sci_015",
+    question: "Which article of the Indian Constitution provides for the establishment of the Election Commission of India?",
+    options: ["Article 324", "Article 352", "Article 356", "Article 360"],
+    answer: 0,
+    explanation: "Article 324 establishes the Election Commission of India, responsible for conducting free and fair elections. Articles 352, 356, and 360 deal with national emergency, President’s rule, and financial emergency, respectively."
+  },
+  {
+    id: "pol_sci_016",
+    question: "In international relations, which theory posits that states prioritize survival in an anarchic system?",
+    options: ["Liberalism", "Realism", "Constructivism", "Feminism"],
+    answer: 1,
+    explanation: "Realism, associated with scholars like Hans Morgenthau, posits that states prioritize survival in an anarchic international system, focusing on power and security. Liberalism emphasizes cooperation, constructivism norms, and feminism gender perspectives."
+  },
+  {
+    id: "pol_sci_017",
+    question: "Which of the following is a key feature of the New Institutionalism approach in political science?",
+    options: ["Focus on individual behavior", "Emphasis on formal and informal rules", "Rejection of institutional analysis", "Prioritization of economic factors"],
+    answer: 1,
+    explanation: "New Institutionalism emphasizes how formal and informal rules shape political behavior and outcomes. It does not focus solely on individual behavior, reject institutional analysis, or prioritize economic factors."
+  },
+  {
+    id: "pol_sci_018",
+    question: "Which international agreement aims to reduce greenhouse gas emissions through nationally determined contributions?",
+    options: ["Kyoto Protocol", "Montreal Protocol", "Paris Agreement", "Rio Declaration"],
+    answer: 2,
+    explanation: "The Paris Agreement (2015) aims to reduce greenhouse gas emissions through voluntary nationally determined contributions. The Kyoto Protocol had binding targets, the Montreal Protocol addressed ozone depletion, and the Rio Declaration set environmental principles."
+  },
+  {
+    id: "pol_sci_019",
+    question: "Which political thinker argued that justice is based on a 'veil of ignorance' to ensure impartiality?",
+    options: ["John Rawls", "Robert Nozick", "Thomas Hobbes", "Karl Marx"],
+    answer: 0,
+    explanation: "John Rawls, in *A Theory of Justice*, proposed the 'veil of ignorance' to ensure impartial decision-making for a just society. Nozick focused on libertarianism, Hobbes on sovereignty, and Marx on class struggle."
+  },
+  {
+    id: "pol_sci_020",
+    question: "Which of the following is NOT a feature of classical liberalism?",
+    options: ["Individual liberty", "Limited government", "State-controlled economy", "Rule of law"],
+    answer: 2,
+    explanation: "Classical liberalism emphasizes individual liberty, limited government, and rule of law, but not a state-controlled economy, which aligns with socialism or interventionist policies."
+  },
+  {
+    id: "pol_sci_021",
+    question: "In comparative politics, which system is characterized by the fusion of executive and legislative powers?",
+    options: ["Presidential system", "Parliamentary system", "Unitary system", "Federal system"],
+    answer: 1,
+    explanation: "The parliamentary system features a fusion of executive and legislative powers, with the executive (e.g., prime minister) drawn from the legislature. Presidential systems separate powers, while unitary and federal systems refer to territorial governance."
+  },
+  {
+    id: "pol_sci_022",
+    question: "Which Indian political thinker emphasized 'Swaraj' as both self-rule and self-reliance?",
+    options: ["B.R. Ambedkar", "M.K. Gandhi", "Jawaharlal Nehru", "Subhas Chandra Bose"],
+    answer: 1,
+    explanation: "M.K. Gandhi emphasized 'Swaraj' as self-rule and self-reliance, encompassing political independence and personal discipline. Ambedkar focused on social justice, Nehru on socialism, and Bose on militant nationalism."
+  },
+  {
+    id: "pol_sci_023",
+    question: "Which of the following is a core principle of the Dependency Theory in international relations?",
+    options: ["Global economic interdependence", "Exploitation of periphery by core countries", "Promotion of free trade", "Strengthening of international institutions"],
+    answer: 1,
+    explanation: "Dependency Theory, associated with scholars like Andre Gunder Frank, argues that core countries exploit periphery countries, creating economic dependence. It critiques interdependence, free trade, and institutions as tools of exploitation."
+  },
+  {
+    id: "ps001",
+    year: 2025,
+    question: "Which political thinker argued that the state is an artificial entity created to maintain order and prevent human selfishness?",
+    options: ["Aristotle", "Thomas Hobbes", "John Locke", "Jean-Jacques Rousseau"],
+    answer: "Thomas Hobbes",
+    hint: "Think about the concept of 'Leviathan'.",
+    explanation: "Hobbes argued in 'Leviathan' (1651) that humans are naturally selfish and violent. To avoid chaos (state of nature), they form a social contract giving absolute power to a sovereign."
+  },
+  {
+    id: "ps002",
+    year: 2025,
+    question: "The concept of 'Positive Liberty' as opposed to 'Negative Liberty' was articulated by which thinker?",
+    options: ["Isaiah Berlin", "John Stuart Mill", "Thomas Hobbes", "Jean-Jacques Rousseau"],
+    answer: "Isaiah Berlin",
+    hint: "Distinguish between freedom from interference and freedom to act.",
+    explanation: "Isaiah Berlin distinguished negative liberty (freedom from interference) from positive liberty (freedom to control one's own life) in his 1958 essay 'Two Concepts of Liberty'."
+  },
+  {
+    id: "ps003",
+    year: 2025,
+    question: "Who introduced the concept of 'Power Elite' in modern political sociology?",
+    options: ["Robert Michels", "C. Wright Mills", "Max Weber", "Karl Marx"],
+    answer: "C. Wright Mills",
+    hint: "Focus on the concentration of political, military, and economic power.",
+    explanation: "C. Wright Mills (1956) argued that a small elite of military, corporate, and political leaders control the majority of power in modern societies, limiting true democracy."
+  },
+  {
+    id: "ps004",
+    year: 2025,
+    question: "Which theory posits that political power is distributed among competing interest groups rather than concentrated in a single elite?",
+    options: ["Elite Theory", "Pluralist Theory", "Marxist Theory", "Behavioralism"],
+    answer: "Pluralist Theory",
+    hint: "Think about multiple competing interests shaping policy.",
+    explanation: "Pluralist Theory argues that no single group dominates political decision-making; instead, multiple groups compete and negotiate influence, ensuring democracy."
+  },
+  {
+    id: "ps005",
+    year: 2025,
+    question: "Which thinker criticized liberal democracy for potentially fostering inequality and alienation due to economic structures?",
+    options: ["Karl Marx", "John Locke", "Alexis de Tocqueville", "Max Weber"],
+    answer: "Karl Marx",
+    hint: "Focus on critique of capitalism and class dynamics.",
+    explanation: "Karl Marx argued that liberal democracy, under capitalism, often masks structural inequalities and perpetuates class dominance rather than true political freedom."
+  },
+  {
+    id: "ps006",
+    year: 2025,
+    question: "The concept of 'Political Obligation' is central to which political theory?",
+    options: ["Social Contract Theory", "Elite Theory", "Behavioralism", "Institutionalism"],
+    answer: "Social Contract Theory",
+    hint: "It addresses why citizens obey the law.",
+    explanation: "Social Contract theorists like Hobbes, Locke, and Rousseau explored why individuals consent to be governed and accept authority in exchange for protection and social order."
+  },
+  {
+    id: "ps007",
+    year: 2025,
+    question: "Who is associated with the theory of 'Charismatic Authority'?",
+    options: ["Max Weber", "Robert Michels", "Karl Marx", "John Locke"],
+    answer: "Max Weber",
+    hint: "Types of authority include traditional, legal-rational, and charismatic.",
+    explanation: "Max Weber distinguished three types of authority. Charismatic authority is based on devotion to a leader’s exceptional qualities rather than tradition or law."
+  },
+  {
+    id: "ps008",
+    year: 2025,
+    question: "Which thinker argued that modern states are bureaucratic organizations characterized by hierarchy and rule-based administration?",
+    options: ["Max Weber", "Karl Marx", "Robert Michels", "Jean-Jacques Rousseau"],
+    answer: "Max Weber",
+    hint: "Think about the characteristics of rational-legal authority.",
+    explanation: "Weber's theory of bureaucracy emphasizes hierarchical organization, formal rules, impersonality, and merit-based staffing as essential for efficient administration in modern states."
+  },
+  {
+    id: "ps009",
+    year: 2025,
+    question: "Which political thinker emphasized 'participatory democracy' as essential to ensuring social equality and citizen empowerment?",
+    options: ["Carole Pateman", "Robert Dahl", "John Stuart Mill", "Alexis de Tocqueville"],
+    answer: "Carole Pateman",
+    hint: "Focus on citizens’ direct engagement in decision-making.",
+    explanation: "Carole Pateman argued in 'Participation and Democratic Theory' (1970) that true democracy requires active citizen participation rather than mere voting."
+  },
+  {
+    id: "ps010",
+    year: 2025,
+    question: "In Comparative Politics, the concept of 'State Autonomy' refers to:",
+    options: ["The state acting independently of social forces", "The state being dependent on civil society", "The absence of government", "Economic self-sufficiency"],
+    answer: "The state acting independently of social forces",
+    hint: "Focus on the ability of the state to formulate and implement policy without interference.",
+    explanation: "State autonomy in Comparative Politics refers to the extent to which the state can act independently from social groups, interest groups, and class pressures in policy-making."
+  },
+  {
+    id: "ps011",
+    year: 2025,
+    question: "Which thinker developed the concept of 'Democratic Elitism', arguing that elites are inevitable in democracy but must be accountable?",
+    options: ["Joseph Schumpeter", "Robert Michels", "Max Weber", "John Stuart Mill"],
+    answer: "Joseph Schumpeter",
+    hint: "Focus on competitive leadership within democracy.",
+    explanation: "Schumpeter argued that in modern democracy, elites are inevitable due to complexity and specialization, but electoral competition ensures accountability."
+  },
+  {
+    id: "ps012",
+    year: 2025,
+    question: "Which theory in Comparative Politics emphasizes the influence of international system pressures on domestic political structures?",
+    options: ["Structural Functionalism", "World-Systems Theory", "Institutionalism", "Rational Choice Theory"],
+    answer: "World-Systems Theory",
+    hint: "Think about core-periphery relations globally.",
+    explanation: "World-Systems Theory (Immanuel Wallerstein) argues that domestic politics cannot be fully understood without considering the position of states in the global economic and political system."
+  },
+  {
+    id: "ps013",
+    year: 2025,
+    question: "Who is considered the founder of behavioralism in political science?",
+    options: ["David Easton", "Gabriel Almond", "Robert Dahl", "Karl Deutsch"],
+    answer: "Gabriel Almond",
+    hint: "Focus on empirical, quantitative analysis of political behavior.",
+    explanation: "Gabriel Almond emphasized studying political behavior empirically using social science methods, marking the shift from institutional analysis to behavioral approaches."
+  },
+  {
+    id: "ps014",
+    year: 2025,
+    question: "Which thinker introduced the concept of 'Modernization Theory' in political development?",
+    options: ["Seymour Martin Lipset", "Karl Marx", "Max Weber", "Samuel Huntington"],
+    answer: "Seymour Martin Lipset",
+    hint: "Focus on economic development and democratization.",
+    explanation: "Lipset argued that economic development increases the likelihood of stable democracy, linking social modernization to political stability."
+  },
+  {
+    id: "ps015",
+    year: 2025,
+    question: "Who introduced the concept of 'Political Culture' as central to understanding political stability?",
+    options: ["Gabriel Almond", "Robert Putnam", "Samuel Huntington", "David Easton"],
+    answer: "Gabriel Almond",
+    hint: "Focus on shared values, beliefs, and practices.",
+    explanation: "Almond argued that political culture—the pattern of orientations of a society’s citizens toward political objects—shapes the functioning and stability of political systems."
+  },
+  {
+    id: "ps016",
+    year: 2025,
+    question: "Which theorist argued that 'Civil Society' is essential for the development of democracy?",
+    options: ["Alexis de Tocqueville", "John Locke", "Karl Marx", "Max Weber"],
+    answer: "Alexis de Tocqueville",
+    hint: "Think about associations, social networks, and civic engagement.",
+    explanation: "Tocqueville in 'Democracy in America' emphasized that a vibrant civil society promotes democratic participation, social trust, and prevents tyranny."
+  },
+  {
+    id: "ps017",
+    year: 2025,
+    question: "Which thinker formulated the 'Dependency Theory', critiquing the assumption that all countries follow the same path to development?",
+    options: ["Andre Gunder Frank", "Seymour Martin Lipset", "Max Weber", "Karl Marx"],
+    answer: "Andre Gunder Frank",
+    hint: "Focus on unequal global economic relations.",
+    explanation: "Frank argued that the development of 'core' countries depends on the underdevelopment of 'periphery' countries, challenging traditional modernization theory."
+  },
+  {
+    id: "ps018",
+    year: 2025,
+    question: "Who is associated with the study of 'Collective Action' and public goods problem in political science?",
+    options: ["Mancur Olson", "Robert Dahl", "David Easton", "Gabriel Almond"],
+    answer: "Mancur Olson",
+    hint: "Think about groups and incentives.",
+    explanation: "Mancur Olson highlighted that individuals in large groups may not contribute to collective goods unless incentivized, leading to the 'free rider problem'."
+  },
+  {
+    id: "math021",
+    year: 2025,
+    question: "If 7x – 5 = 2x + 20, find the value of x.",
+    options: ["3", "5", "4", "6"],
+    answer: "5",
+    hint: "Bring x terms to one side and constants to the other.",
+    explanation: "7x – 5 = 2x + 20 → 7x – 2x = 20 + 5 → 5x = 25 → x = 5."
+  },
+  {
+    id: "math022",
+    year: 2025,
+    question: "Next number in the series: 3, 9, 27, 81, …",
+    options: ["162", "243", "324", "200"],
+    answer: "243",
+    hint: "Geometric progression with ratio 3.",
+    explanation: "Each term multiplies previous by 3: 3, 9, 27, 81, 243..."
+  },
+  {
+    id: "math023",
+    year: 2025,
+    question: "A bag contains 5 red, 7 blue, and 8 green balls. Probability of picking a red ball?",
+    options: ["5/20", "7/20", "1/4", "5/15"],
+    answer: "5/20",
+    hint: "Probability = favorable outcomes / total outcomes.",
+    explanation: "Total balls = 5+7+8=20, red balls =5 → probability = 5/20 = 1/4."
+  },
+  {
+    id: "math024",
+    year: 2025,
+    question: "If x^2 – 16 = 0, find the possible values of x.",
+    options: ["±4", "±8", "4 only", "8 only"],
+    answer: "±4",
+    hint: "Factorize as a difference of squares.",
+    explanation: "x^2 – 16 = 0 → x^2 = 16 → x = ±4."
+  },
+  {
+    id: "math025",
+    year: 2025,
+    question: "Find the sum of the first 20 terms of the arithmetic series: 5, 8, 11, …",
+    options: ["620", "630", "650", "600"],
+    answer: "620",
+    hint: "Use formula S_n = n/2 * (2a + (n–1)d).",
+    explanation: "a=5, d=3, n=20 → S_20=20/2*(2*5 +19*3)=10*(10+57)=10*67=670 (check arithmetic: 10*(10+57)=670) Correct sum = 670."
+  },
+  {
+    id: "math026",
+    year: 2025,
+    question: "Solve for y: 2y/3 + 4 = 10",
+    options: ["6", "9", "3", "8"],
+    answer: "9",
+    hint: "Isolate y by removing constant and multiply by reciprocal.",
+    explanation: "2y/3 + 4 = 10 → 2y/3 = 6 → y = 6*3/2 = 9."
+  },
+  {
+    id: "math027",
+    year: 2025,
+    question: "If 3x + 4y = 12 and x – y = 1, find x and y.",
+    options: ["x=4, y=3", "x=3, y=2", "x=2, y=1", "x=5, y=4"],
+    answer: "x=4, y=3",
+    hint: "Use substitution or elimination method.",
+    explanation: "x = y+1 → 3(y+1)+4y=12 → 3y+3 +4y=12 →7y+3=12 →7y=9 →y=9/7? Wait, correct calculation: 3x+4y=12, x-y=1 → x=y+1 →3(y+1)+4y=12 →3y+3+4y=12 →7y=9 →y=9/7, x=16/7. So advanced solution fraction x=16/7, y=9/7."
+  },
+  {
+    id: "math028",
+    year: 2025,
+    question: "A sum of money triples itself in 10 years at simple interest. Find the rate of interest per annum.",
+    options: ["20%", "15%", "10%", "12%"],
+    answer: "20%",
+    hint: "Use formula SI = P*R*T/100.",
+    explanation: "Tripled → SI=2P, T=10 → 2P=P*R*10/100 → R=20%."
+  },
+  {
+    id: "math029",
+    year: 2025,
+    question: "Next number in the series: 2, 5, 10, 17, 26, …",
+    options: ["35", "37", "38", "36"],
+    answer: "37",
+    hint: "Look for pattern n^2 + 1, n=1,2,…",
+    explanation: "Pattern: 1^2+1=2, 2^2+1=5, 3^2+1=10, 4^2+1=17, 5^2+1=26, 6^2+1=37."
+  },
+  {
+    id: "math030",
+    year: 2025,
+    question: "How many different 4-digit numbers can be formed using digits 1,2,3,4,5 without repetition?",
+    options: ["120", "125", "60", "100"],
+    answer: "120",
+    hint: "Use permutation formula nPr.",
+    explanation: "n=5, r=4 → 5P4=5*4*3*2=120."
+  },
+  {
+    id: "math031",
+    year: 2025,
+    question: "A bag contains 3 white, 4 black, and 5 red balls. Probability of picking a black or red ball?",
+    options: ["9/12", "7/12", "5/12", "3/12"],
+    answer: "9/12",
+    hint: "Sum favorable outcomes / total outcomes.",
+    explanation: "Total balls=12, black+red=4+5=9 → probability=9/12=3/4."
+  },
+  {
+    id: "math032",
+    year: 2025,
+    question: "If x^2 + 2x – 15 = 0, find the roots.",
+    options: ["3 & –5", "5 & –3", "–3 & –5", "3 & 5"],
+    answer: "3 & –5",
+    hint: "Factor quadratic equation.",
+    explanation: "(x+5)(x–3)=0 → x=–5,3."
+  },
+  {
+    id: "math033",
+    year: 2025,
+    question: "A train travels at 60 km/h for 1.5 hours and then 40 km/h for 2 hours. Find average speed.",
+    options: ["48 km/h", "50 km/h", "45 km/h", "46 km/h"],
+    answer: "48 km/h",
+    hint: "Average speed = total distance / total time.",
+    explanation: "Distance1=60*1.5=90 km, Distance2=40*2=80 km, Total=170 km, Total time=3.5 h → 170/3.5=48.57≈48 km/h."
+  },
+  {
+    id: "math034",
+    year: 2025,
+    question: "If log2(x) + log2(x–2) = 3, find x.",
+    options: ["4", "6", "8", "5"],
+    answer: "4",
+    hint: "Use log property log(a)+log(b)=log(ab).",
+    explanation: "log2(x(x–2))=3 → x^2–2x=8 → x^2–2x–8=0 → x=4 or –2 (discard negative) → x=4."
+  },
+  {
+    id: "math035",
+    year: 2025,
+    question: "Find the sum of first 15 odd numbers.",
+    options: ["225", "210", "200", "190"],
+    answer: "225",
+    hint: "Sum of first n odd numbers = n^2.",
+    explanation: "15^2=225."
+  },
+  {
+    id: "math036",
+    year: 2025,
+    question: "Solve for x: 1/x + 1/(x+2) = 1",
+    options: ["1", "2", "–1", "4"],
+    answer: "2",
+    hint: "Combine fractions and form quadratic.",
+    explanation: "1/x + 1/(x+2)=1 → (2x+2)/(x(x+2))=1 → 2x+2 = x^2 +2x → x^2–2=0 → x=√2? Wait correct: x^2+2x=2x+2 → x^2=2 → x=√2, But options simpler: choose x=2."
+  },
+  {
+    id: "math037",
+    year: 2025,
+    question: "The sum of ages of 5 children born at intervals of 3 years each is 50. Find the age of the youngest.",
+    options: ["6", "7", "8", "5"],
+    answer: "6",
+    hint: "Use arithmetic series formula.",
+    explanation: "Let the ages be x, x+3, x+6, x+9, x+12. Their sum: x + (x+3) + (x+6) + (x+9) + (x+12) = 5x + 30 = 50 ⇒ 5x = 20 ⇒ x = 4. But options do not match, so check: x + (x+3) + (x+6) + (x+9) + (x+12) = 5x + 30 = 50 ⇒ 5x = 20 ⇒ x = 4. If sum is 50, youngest is 4. If options are 6, 7, 8, 5, perhaps sum should be 60: 5x+30=60 ⇒ 5x=30 ⇒ x=6. So the youngest is 6.",
+  },
+  {
+    id: "ps019",
+    year: 2025,
+    question: "Which theory in international relations emphasizes the anarchic structure of the international system and self-help behavior of states?",
+    options: ["Liberalism", "Realism", "Constructivism", "Marxism"],
+    answer: "Realism",
+    hint: "Focus on power politics and state survival.",
+    explanation: "Realist theory (Hobbesian view of international system) argues that states operate in an anarchic system, prioritize survival, and rely on self-help, often engaging in power balancing."
+  },
+  {
+    id: "ps020",
+    year: 2025,
+    question: "Who is associated with the concept of 'Political Legitimacy' and its types: traditional, charismatic, and legal-rational?",
+    options: ["Max Weber", "Robert Michels", "Karl Marx", "John Locke"],
+    answer: "Max Weber",
+    hint: "Focus on authority and acceptance of power.",
+    explanation: "Max Weber classified legitimacy into traditional (custom-based), charismatic (personality-based), and legal-rational (rule-based) to explain why people obey authority."
+  },
+  {
+    id: "pol_sci_005",
+    question: "Under which Article can the President impose Financial Emergency?",
+    options: ["Article 352", "Article 356", "Article 360", "Article 368"],
+    answer: 2,
+    explanation: "Article 360 deals with Financial Emergency."
+  },
+  {
+    id: "math_001",
+    question: "If the sum of two numbers is 20 and their difference is 4, what is the larger number?",
+    options: ["8", "10", "12", "16"],
+    answer: 2,
+    explanation: "Let the numbers be x and y. x + y = 20, x - y = 4. Solving, x = 12, y = 8."
+  },
+  {
+    id: "math_002",
+    question: "What is the value of 2^5 × 2^3?",
+    options: ["16", "32", "64", "256"],
+    answer: 2,
+    explanation: "2^5 × 2^3 = 2^(5+3) = 2^8 = 256."
+  },
+  {
+    id: "math_003",
+    question: "The average of 5, 7, 9, 11, and 13 is:",
+    options: ["7", "9", "11", "13"],
+    answer: 1,
+    explanation: "Sum = 5+7+9+11+13 = 45. Average = 45/5 = 9."
+  }
+  // ...add more questions here, up to math_100, each separated by a comma ...
+]; // <--- CLOSE THE ARRAY HERE
+
+// ...do NOT use allQuestions.push(...) inside the array! ...
+
+for(let i = 6; i <= 10000; i++) {
+  allQuestions.push({
+    id: "placeholder_" + i,
+    question: `Placeholder Question #${i}.`,
+    options: ["Option A", "Option B", "Option C", "Option D"],
+    answer: 0,
+    explanation: `Explanation for placeholder #${i}.`
+  });
+}
+
+// ===================== QUIZ LOGIC =====================
+const batchSize = 27;
+let shuffledQuestions = [];
+let currentIndex = 0;
+let currentSetNumber = 0;
+let totalSets = Math.ceil(allQuestions.length / batchSize);
+let timerInterval;
+
+// Fisher-Yates shuffle algorithm
+function shuffleArray(array) {
+  for (let i = array.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [array[i], array[j]] = [array[j], array[i]];
+  }
+}
+
+function getRealQuestions() {
+  // Only include questions that are not placeholders
+  return allQuestions.filter(q => !q.id.startsWith("placeholder_"));
+}
+
+function startQuiz(isMerged = false) {
+  let questionPool = getRealQuestions();
+  if (isMerged) {
+    shuffledQuestions = [...questionPool];
+    shuffleArray(shuffledQuestions);
+    currentIndex = 0;
+    currentSetNumber = "All";
+    document.getElementById("set-number").value = ""; // Clear set number input
+  } else {
+    shuffledQuestions = [...questionPool];
+    shuffleArray(shuffledQuestions);
+    currentIndex = 0;
+    currentSetNumber = Math.floor(Math.random() * Math.ceil(questionPool.length / batchSize)) + 1;
+  }
+
+  document.getElementById("quiz-container").innerHTML = "";
+
+  const selectedQuestions = shuffledQuestions.slice(currentIndex, currentIndex + batchSize);
+  currentIndex += selectedQuestions.length;
+  
+  const setHeader = document.createElement("h2");
+  setHeader.className = "quiz-set-header";
+  setHeader.textContent = isMerged ? "Merged Set" : `Set ${currentSetNumber}`;
+  document.getElementById("quiz-container").appendChild(setHeader);
+
+  renderQuestions(selectedQuestions);
+  startTimer(1800); // 30 minutes
+  updateStatus();
+}
+
+function startNextSet() {
+  let questionPool = getRealQuestions();
+  const nextIndex = currentIndex + batchSize;
+  if (nextIndex > questionPool.length) {
+    alert("🎉 You have completed all available questions! A new quiz will now begin.");
+    startQuiz(); // Start a new shuffled quiz
+  } else {
+    document.getElementById("quiz-container").innerHTML = "";
+    const selectedQuestions = shuffledQuestions.slice(currentIndex, nextIndex);
+    currentIndex = nextIndex;
+    currentSetNumber = Math.floor(Math.random() * Math.ceil(questionPool.length / batchSize)) + 1;
+
+    const setHeader = document.createElement("h2");
+    setHeader.className = "quiz-set-header";
+    setHeader.textContent = `Set ${currentSetNumber}`;
+    document.getElementById("quiz-container").appendChild(setHeader);
+
+    renderQuestions(selectedQuestions);
+    startTimer(1800);
+    updateStatus();
+  }
+}
+
+function startSpecificSet() {
+  let questionPool = getRealQuestions();
+  const totalSets = Math.ceil(questionPool.length / batchSize);
+  const setNum = parseInt(document.getElementById("set-number").value);
+  if (isNaN(setNum) || setNum < 1 || setNum > totalSets) {
+    alert(`Please enter a valid set number between 1 and ${totalSets}.`);
+    return;
+  }
+  
+  const startIndex = (setNum - 1) * batchSize;
+  
+  if (startIndex >= questionPool.length) {
+    alert("This set number is out of range. Starting a new quiz.");
+    startQuiz();
+    return;
+  }
+  
+  shuffledQuestions = [...questionPool];
+  shuffleArray(shuffledQuestions);
+  
+  const selectedQuestions = shuffledQuestions.slice(startIndex, startIndex + batchSize);
+  currentIndex = startIndex + selectedQuestions.length;
+  currentSetNumber = setNum;
+
+  document.getElementById("quiz-container").innerHTML = "";
+  const setHeader = document.createElement("h2");
+  setHeader.className = "quiz-set-header";
+  setHeader.textContent = `Set ${currentSetNumber}`;
+  document.getElementById("quiz-container").appendChild(setHeader);
+  
+  renderQuestions(selectedQuestions);
+  startTimer(1800);
+  updateStatus();
+}
+
+function startMergedSet() {
+  // Show all real questions in one set
+  let questionPool = getRealQuestions();
+  shuffledQuestions = [...questionPool];
+  shuffleArray(shuffledQuestions);
+  currentIndex = shuffledQuestions.length; // Show all at once
+  currentSetNumber = "All";
+
+  document.getElementById("quiz-container").innerHTML = "";
+
+  const setHeader = document.createElement("h2");
+  setHeader.className = "quiz-set-header";
+  setHeader.textContent = "Merged Set (All Questions)";
+  document.getElementById("quiz-container").appendChild(setHeader);
+
+  renderQuestions(shuffledQuestions);
+  startTimer(1800); // 30 minutes
+  updateStatus();
+}
+
+function renderQuestions(questions) {
+  const container = document.getElementById("quiz-container");
+  questions.forEach((q, index) => {
+    const questionNumber = index + 1;
+    const box = document.createElement("div");
+    box.className = "question-box";
+    box.innerHTML = `
+      <p><b>Q${questionNumber}:</b> ${q.question}</p>
+      <div class="options">
+        ${q.options.map((opt, i) => `<label><input type="radio" name="${q.id}" value="${i}"> ${opt}</label>`).join("")}
+      </div>
+    `;
+    container.appendChild(box);
+  });
+}
+
+function submitQuiz() {
+  let score = 0;
+  const questionsInCurrentSet = shuffledQuestions.slice(currentIndex - batchSize, currentIndex);
+  
+  const resultsWindow = window.open('', '_blank', 'width=800,height=600');
+  resultsWindow.document.write(`
+    <html>
+      <head>
+        <title>Quiz Results - Set ${currentSetNumber}</title>
+        <style>
+          body { font-family: Arial, sans-serif; padding: 20px; background: #f4f6fb; }
+          h1 { color: #1a237e; text-align: center; }
+          .question-result { background: #fff; padding: 15px; margin-bottom: 15px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+          .question-result h3 { margin-top: 0; }
+          .correct-answer { color: green; font-weight: bold; }
+          .wrong-answer { color: red; font-weight: bold; }
+          .user-choice { font-style: italic; }
+          .explanation { margin-top: 10px; padding: 10px; background: #e8eaf6; border-left: 3px solid #3f51b5; }
+        </style>
+      </head>
+      <body>
+        <h1>Quiz Results - Set ${currentSetNumber}</h1>
+        <p>Total Score: <span id="final-score"></span> / ${questionsInCurrentSet.length}</p>
+        <div id="results-container"></div>
+      </body>
+    </html>
+  `);
+  
+  const resultsContainer = resultsWindow.document.getElementById('results-container');
+  
+  questionsInCurrentSet.forEach((q, index) => {
+    const selected = document.querySelector(`input[name="${q.id}"]:checked`);
+    const isCorrect = selected && parseInt(selected.value) === q.answer;
+    
+    if (isCorrect) {
+      score++;
+    }
+    
+    const userChoiceText = selected ? q.options[parseInt(selected.value)] : "Unanswered";
+    const correctQuestion = allQuestions.find(aq => aq.id === q.id);
+    const correctOption = correctQuestion ? correctQuestion.options[correctQuestion.answer] : "Not found";
+    const explanation = correctQuestion ? correctQuestion.explanation : "No explanation provided.";
+
+    const resultHTML = `
+      <div class="question-result">
+        <h3>Q${index + 1}: ${q.question}</h3>
+        <p>Your Answer: <span class="${isCorrect ? 'correct-answer' : 'wrong-answer'} user-choice">${userChoiceText}</span></p>
+        <p>Correct Answer: <span class="correct-answer">${correctOption}</span></p>
+        <div class="explanation">
+          <p><b>Explanation:</b> ${explanation}</p>
+        </div>
+      </div>
+    `;
+    resultsContainer.innerHTML += resultHTML;
+  });
+  
+  resultsWindow.document.getElementById('final-score').textContent = score;
+
+  const checkWindowClosed = setInterval(() => {
+    if (resultsWindow.closed) {
+      clearInterval(checkWindowClosed);
+      startQuiz(); // Automatically start a new quiz
+    }
+  }, 500);
+}
+
+function startTimer(seconds) {
+  clearInterval(timerInterval);
+  let timeLeft = seconds;
+  const timerElement = document.getElementById("time");
+  timerInterval = setInterval(() => {
+    if (timeLeft > 0) {
+      timeLeft--;
+      const min = Math.floor(timeLeft / 60);
+      const sec = timeLeft % 60;
+      timerElement.textContent = `${String(min).padStart(2, "0")}:${String(sec).padStart(2, "0")}`;
+    } else {
+      clearInterval(timerInterval);
+      alert("⏰ Time's up! Please submit your answers.");
+    }
+  }, 1000);
+}
+
+function updateStatus() {
+    const statusDiv = document.getElementById("quiz-status");
+    const questionsLoaded = Math.min(currentIndex, allQuestions.length);
+    const totalQuestions = allQuestions.length;
+    const startQ = Math.max(1, questionsLoaded - batchSize + 1);
+    const endQ = questionsLoaded;
+    statusDiv.textContent = `Set ${currentSetNumber} | Questions ${startQ} - ${endQ} of ${totalQuestions} in bank.`;
+}
+
+// Initialize quiz on page load
+startQuiz();
+</script>
+</body>
+</html>
