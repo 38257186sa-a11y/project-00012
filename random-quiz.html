@@ -5,38 +5,33 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>UGC NET Political Science - Random Quiz</title>
   <style>
-    body { font-family: Arial, sans-serif; background: #f4f6fb; margin: 0; padding: 20px; }
-    h1 { color: #1a237e; text-align: center; }
-    .question-box { background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); margin-bottom: 20px; }
-    .options label { display: block; margin: 8px 0; cursor: pointer; }
-    button { background: #1a237e; color: #fff; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; margin-top: 10px; }
-    button:hover { background: #3949ab; }
-    .hint { margin-top: 10px; color: #555; display: none; }
-    #timer { font-weight: bold; color: red; margin-bottom: 20px; text-align: center; }
+    body { font-family: Arial, sans-serif; background: #f4f6fb; margin:0; padding:20px; }
+    h1 { text-align: center; color: #1a237e; }
+    .question-box { background: #fff; padding:20px; border-radius:8px; margin-bottom:20px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+    .options label { display:block; margin:8px 0; cursor:pointer; }
+    button { background:#1a237e; color:#fff; padding:10px 20px; border:none; border-radius:5px; cursor:pointer; margin-top:10px; }
+    button:hover { background:#3949ab; }
+    .hint { margin-top:10px; color:#555; display:none; }
+    #timer { font-weight:bold; color:red; margin-bottom:20px; text-align:center; }
   </style>
 </head>
 <body>
-  <h1>Random Quiz - 1000 Questions</h1>
+  <h1>Random Quiz - Political Science</h1>
   <div id="timer">Time Left: <span id="time">30:00</span></div>
   <div id="quiz-container"></div>
   <button onclick="nextBatch()">Next Batch (29 Questions)</button>
-  <button onclick="refreshQuiz()">🔄 Refresh</button>
+  <button onclick="refreshQuiz()">🔄 Refresh Quiz</button>
 
   <script>
-    // ================= Embedded Questions =================
+    // ===================== QUESTIONS =====================
+    // Add or update questions directly here
     const allQuestions = [
       { id:"q1", year:2004, question:"Who is regarded as the father of political science?", options:["Plato","Aristotle","Machiavelli","Socrates"], answer:1, hint:"He wrote Politics." },
       { id:"q2", year:2004, question:"Which thinker introduced the concept of 'Leviathan'?", options:["Locke","Rousseau","Hobbes","Bentham"], answer:2, hint:"He believed in social contract and strong sovereign." },
       { id:"q3", year:2005, question:"The concept of 'Hegemony' was elaborated by?", options:["Karl Marx","Max Weber","Antonio Gramsci","David Easton"], answer:2, hint:"Italian Marxist, wrote Prison Notebooks." },
+      { id:"q4", year:2005, question:"Who wrote 'The Social Contract'?", options:["Rousseau","Locke","Hobbes","Machiavelli"], answer:0, hint:"He emphasized general will." },
+      { id:"q5", year:2006, question:"Who introduced concept of 'Power Elite'?", options:["C. Wright Mills","Max Weber","Parsons","Dahl"], answer:0, hint:"American sociologist, 1956." },
       {
-    id: "q1",
-    year: 2004,
-    question: "Who is regarded as the father of political science?",
-    options: ["Plato", "Aristotle", "Machiavelli", "Socrates"],
-    answer: 1,
-    hint: "He wrote Politics."
-  },
-  {
     id: "q2",
     year: 2004,
     question: "Which thinker introduced the concept of 'Leviathan'?",
@@ -243,17 +238,15 @@
     answer: 2,
     hint: "Italian Marxist, wrote Prison Notebooks."
   }
-      { id:"q4", year:2005, question:"Who wrote 'The Social Contract'?", options:["Rousseau","Locke","Hobbes","Machiavelli"], answer:0, hint:"He emphasized general will." },
-      { id:"q5", year:2006, question:"Who introduced concept of 'Power Elite'?", options:["C. Wright Mills","Max Weber","Parsons","Dahl"], answer:0, hint:"American sociologist, 1956." },
       { id:"q6", year:2006, question:"Which thinker developed 'Pluralist Theory'?", options:["Dahl","Marx","Michels","Hobbes"], answer:0, hint:"Robert Dahl, 1961." },
       { id:"q7", year:2007, question:"Who authored 'Politics as a Vocation'?", options:["Weber","Parsons","Easton","Lasswell"], answer:0, hint:"Max Weber, German sociologist." },
       { id:"q8", year:2007, question:"Which theory emphasizes 'social contract'?", options:["Liberalism","Marxism","Realism","Constructivism"], answer:0, hint:"Philosophers: Hobbes, Locke, Rousseau." },
       { id:"q9", year:2008, question:"Who wrote 'Democracy in America'?", options:["Alexis de Tocqueville","Bentham","Machiavelli","Rousseau"], answer:0, hint:"French political thinker, 1835." },
       { id:"q10", year:2008, question:"Which is core idea of Machiavelli's 'The Prince'?", options:["Virtue ethics","Power and pragmatism","Justice","Liberty"], answer:1, hint:"Focus on political realism." }
-      // … continue up to q1000 …
+      // You can add more questions here: q11, q12, etc.
     ];
 
-    // ================= Quiz Logic =================
+    // ===================== QUIZ LOGIC =====================
     let usedQuestions = new Set();
     const batchSize = 29;
     let timerInterval;
@@ -269,15 +262,15 @@
         }
       }
       renderQuestions(selected);
-      startTimer(1800); // 30 minutes
+      startTimer(1800); // 30 mins
     }
 
-    function renderQuestions(questions) {
+    function renderQuestions(questions){
       const container = document.getElementById("quiz-container");
       questions.forEach((q,index)=>{
         const box = document.createElement("div");
-        box.className = "question-box";
-        box.innerHTML = `
+        box.className="question-box";
+        box.innerHTML=`
           <p><b>Q${index+1}:</b> ${q.question}</p>
           ${q.options.map((opt,i)=>`<label><input type="radio" name="${q.id}" value="${i}"> ${opt}</label>`).join("")}
           <button onclick="checkAnswer('${q.id}',${q.answer})">Submit</button>
@@ -324,11 +317,11 @@
       let timeLeft = seconds;
       const timerElement = document.getElementById("time");
       timerInterval = setInterval(()=>{
-        if(timeLeft > 0){
+        if(timeLeft>0){
           timeLeft--;
           const min = Math.floor(timeLeft/60);
           const sec = timeLeft%60;
-          timerElement.textContent = `${String(min).padStart(2,"0")}:${String(sec).padStart(2,"0")}`;
+          timerElement.textContent=`${String(min).padStart(2,"0")}:${String(sec).padStart(2,"0")}`;
         } else {
           clearInterval(timerInterval);
           alert("⏰ Time's up!");
@@ -336,7 +329,7 @@
       },1000);
     }
 
-    // Initialize
+    // Initialize quiz on page load
     startQuiz();
   </script>
 </body>
