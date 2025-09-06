@@ -1,251 +1,126 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Advanced Political Theory Quiz</title>
-<style>
-  body { font-family: Arial, sans-serif; background: #f4f6fb; padding: 20px; max-width: 700px; margin: auto; }
-  h1 { color: #1a237e; text-align: center; }
-  .question { font-size: 1.15em; margin-bottom: 8px; }
-  .options { display: flex; flex-direction: column; gap: 8px; margin-bottom: 12px; }
-  .option-button {
-    background: #1a237e;
-    color: white;
-    padding: 10px 15px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 1em;
-    text-align: left;
-    transition: background-color 0.3s;
-  }
-  .option-button:hover:not(:disabled) { background: #3949ab; }
-  .option-button:disabled { opacity: 0.7; cursor: default; }
-  .correct { background-color: #4caf50 !important; }
-  .wrong { background-color: #f44336 !important; }
-  #hint { margin-top: 10px; color: #555; font-style: italic; display: none; }
-  #result { margin-top: 15px; font-weight: bold; font-size: 1.2em; min-height: 25px; }
-  #restart { display: none; margin-top: 20px; padding: 10px 20px; background: #1a237e; color: white; border: none; border-radius: 5px; cursor: pointer; }
-  #restart:hover { background: #3949ab; }
-  #report { margin-top: 20px; padding: 15px; border: 1px solid #ddd; background: white; border-radius: 8px; font-size: 1.1em; display: none; }
-  #time-taken { margin-top: 15px; font-style: italic; color: #333; }
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Political Theory - Quiz 1</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f6fb;
+      margin: 0; padding: 0;
+    }
+    header {
+      background: #1a237e;
+      color: #fff;
+      padding: 15px;
+      text-align: center;
+    }
+    .container {
+      max-width: 800px;
+      margin: 30px auto;
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      padding: 20px;
+    }
+    .question {
+      margin-bottom: 20px;
+    }
+    .options label {
+      display: block;
+      margin: 5px 0;
+      padding: 8px;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+    .options input {
+      margin-right: 10px;
+    }
+    .options label:hover {
+      background: #f1f1f1;
+    }
+    button {
+      background: #1a237e;
+      color: #fff;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 6px;
+      cursor: pointer;
+      margin-top: 15px;
+    }
+    button:hover {
+      background: #3949ab;
+    }
+    .result {
+      margin-top: 20px;
+      font-weight: bold;
+      color: #1a237e;
+    }
+  </style>
 </head>
 <body>
+  <header>
+    <h1>Political Theory - Quiz 1</h1>
+  </header>
 
-<h1>Advanced Political Theory Quiz</h1>
+  <div class="container">
+    <form id="quizForm">
 
-<div id="quiz-container">
-  <div id="question" class="question"></div>
-  <div id="options" class="options"></div>
-  <button id="hint-btn">Show Hint</button>
-  <div id="hint"></div>
-  <div id="result"></div>
-  <div id="time-taken"></div>
-  <button id="restart">Restart Quiz</button>
-  <div id="report"></div>
-</div>
+      <div class="question">
+        <p>1. Who is regarded as the father of modern political science?</p>
+        <div class="options">
+          <label><input type="radio" name="q1" value="A"> Plato</label>
+          <label><input type="radio" name="q1" value="B"> Aristotle</label>
+          <label><input type="radio" name="q1" value="C"> Machiavelli</label>
+          <label><input type="radio" name="q1" value="D"> Hobbes</label>
+        </div>
+      </div>
 
-<script>
-  const quizData = [
-    {
-      question: "Which philosopher is known as the father of normative philosophical political theory?",
-      options: ["Plato", "Aristotle", "Machiavelli", "Marx"],
-      answer: "Plato",
-      hint: "Plato’s political theory focuses on ideals of justice, virtue, and the best political order."
-    },
-    {
-      question: "Aristotle’s theory of causation follows which correct sequence?",
-      options: ["Final, Formal, Efficient, Material", "Material, Formal, Efficient, Final", "Efficient, Material, Formal, Final", "Formal, Material, Final, Efficient"],
-      answer: "Material, Formal, Efficient, Final",
-      hint: "Aristotle's causation moves from the matter to its form, the agent causing change, and the purpose."
-    },
-    {
-      question: "The 'Golden Mean' in political theory is attributed to which thinker?",
-      options: ["Plato", "Aristotle", "Locke", "Rousseau"],
-      answer: "Aristotle",
-      hint: "This principle advocates moderation between extremes in virtue and governance."
-    },
-    {
-      question: "Plato’s concept of justice in the Republic primarily emphasizes:",
-      options: ["One man - one work; one class - one duty", "Equality for all citizens", "Right of the strongest", "Majority rule"],
-      answer: "One man - one work; one class - one duty",
-      hint: "Justice, according to Plato, involves everyone fulfilling their assigned role in society."
-    },
-    {
-      question: "Which modern thinker is associated with the 'veil of ignorance' and the 'original position'?",
-      options: ["John Rawls", "Robert Nozick", "Karl Marx", "T.H. Green"],
-      answer: "John Rawls",
-      hint: "This is a hypothetical situation to determine principles of justice without bias."
-    },
-    {
-      question: "The doctrine of 'Consent theory' and 'Tabula Rasa' is primarily linked to which thinker?",
-      options: ["Locke", "Hobbes", "Montesquieu", "Rousseau"],
-      answer: "Locke",
-      hint: "This thinker emphasized the role of government based on governed's consent and human mind as a blank slate."
-    },
-    {
-      question: "Which thinker proposed the idea of a 'Nightwatchman State'?",
-      options: ["John Rawls", "Robert Nozick", "Bentham", "Marx"],
-      answer: "Robert Nozick",
-      hint: "This concept emphasizes minimal state intervention focusing on protection and law enforcement."
-    },
-    {
-      question: "The political idea of 'Absolute Sovereignty' was championed by:",
-      options: ["Hobbes", "Locke", "Montesquieu", "Rousseau"],
-      answer: "Hobbes",
-      hint: "This thinker believed in a strong centralized authority to avoid anarchy."
-    },
-    {
-      question: "According to Marx, which term defines the overthrow of the capitalist class?",
-      options: ["Dictatorship of the proletariat", "Classless society", "Labor theory of value", "Historical materialism"],
-      answer: "Dictatorship of the proletariat",
-      hint: "Marx advocated for the working class to take control as a necessary step."
-    },
-    {
-      question: "In Plato's Republic, what characterizes the guardian class?",
-      options: ["Wise and virtuous rulers", "Warriors with civic courage", "Craftsmen and farmers", "Philosopher kings"],
-      answer: "Warriors with civic courage",
-      hint: "Guardians protect the state and exemplify courage and discipline."
-    }
-  ];
+      <div class="question">
+        <p>2. The concept of 'Leviathan' was introduced by:</p>
+        <div class="options">
+          <label><input type="radio" name="q2" value="A"> John Locke</label>
+          <label><input type="radio" name="q2" value="B"> Rousseau</label>
+          <label><input type="radio" name="q2" value="C"> Hobbes</label>
+          <label><input type="radio" name="q2" value="D"> Montesquieu</label>
+        </div>
+      </div>
 
-  let currentIndex = 0;
-  let score = 0;
-  let answers = [];
-  let quizStartTime = null;
-  let quizEndTime = null;
+      <div class="question">
+        <p>3. “Justice as Fairness” is a theory proposed by:</p>
+        <div class="options">
+          <label><input type="radio" name="q3" value="A"> John Rawls</label>
+          <label><input type="radio" name="q3" value="B"> Robert Nozick</label>
+          <label><input type="radio" name="q3" value="C"> Amartya Sen</label>
+          <label><input type="radio" name="q3" value="D"> Bentham</label>
+        </div>
+      </div>
 
-  const questionEl = document.getElementById('question');
-  const optionsEl = document.getElementById('options');
-  const hintEl = document.getElementById('hint');
-  const resultEl = document.getElementById('result');
-  const hintBtn = document.getElementById('hint-btn');
-  const restartBtn = document.getElementById('restart');
-  const reportEl = document.getElementById('report');
-  const timeTakenEl = document.getElementById('time-taken');
+      <button type="button" onclick="checkAnswers()">Submit Quiz</button>
+    </form>
 
-  function loadQuestion() {
-    if (currentIndex === 0) {
-      quizStartTime = new Date();
-    }
-    const current = quizData[currentIndex];
-    questionEl.textContent = current.question;
-    optionsEl.innerHTML = '';
-    hintEl.style.display = 'none';
-    hintEl.textContent = '';
-    resultEl.textContent = '';
-    reportEl.style.display = 'none';
-    timeTakenEl.textContent = '';
-    hintBtn.textContent = 'Show Hint';
-    hintBtn.disabled = false;
+    <div class="result" id="result"></div>
+  </div>
 
-    current.options.forEach(option => {
-      const btn = document.createElement('button');
-      btn.className = 'option-button';
-      btn.textContent = option;
-      btn.onclick = () => checkAnswer(btn, option);
-      optionsEl.appendChild(btn);
-    });
-  }
+  <script>
+    function checkAnswers() {
+      const answers = { q1: "B", q2: "C", q3: "A" };
+      let score = 0;
+      let total = Object.keys(answers).length;
 
-  function checkAnswer(button, selected) {
-    const correct = quizData[currentIndex].answer;
-
-    // Disable all buttons
-    const buttons = optionsEl.querySelectorAll('.option-button');
-    buttons.forEach(btn => btn.disabled = true);
-
-    // Highlight buttons
-    buttons.forEach(btn => {
-      if (btn.textContent === correct) {
-        btn.classList.add('correct');
+      for (let key in answers) {
+        let selected = document.querySelector(`input[name="${key}"]:checked`);
+        if (selected && selected.value === answers[key]) {
+          score++;
+        }
       }
-      if (btn === button && selected !== correct) {
-        btn.classList.add('wrong');
-      }
-    });
 
-    if (selected === correct) {
-      resultEl.textContent = "✅ Correct!";
-      resultEl.style.color = "green";
-      score++;
-      answers.push({ question: quizData[currentIndex].question, selected, correct, isCorrect: true });
-    } else {
-      resultEl.textContent = `❌ Wrong! Correct Answer: ${correct}`;
-      resultEl.style.color = "red";
-      answers.push({ question: quizData[currentIndex].question, selected, correct, isCorrect: false });
+      document.getElementById("result").innerText =
+        `You scored ${score} out of ${total}`;
     }
-
-    hintBtn.disabled = true;
-
-    currentIndex++;
-    if (currentIndex < quizData.length) {
-      setTimeout(loadQuestion, 2000);
-    } else {
-      quizEndTime = new Date();
-      setTimeout(showReport, 2000);
-    }
-  }
-
-  function showReport() {
-    questionEl.textContent = "Quiz Completed!";
-    optionsEl.innerHTML = '';
-    hintBtn.style.display = 'none';
-    restartBtn.style.display = 'inline-block';
-    resultEl.textContent = '';
-    hintEl.style.display = 'none';
-
-    const timeTakenSeconds = Math.floor((quizEndTime - quizStartTime) / 1000);
-    let timeText = `Total Time Taken: ${Math.floor(timeTakenSeconds / 60)} minutes ${timeTakenSeconds % 60} seconds.`;
-    timeTakenEl.textContent = timeText;
-
-    let wrongCount = quizData.length - score;
-    let percent = ((score / quizData.length) * 100).toFixed(2);
-
-    let reportHTML = `<p>Total Questions: ${quizData.length}</p>`;
-    reportHTML += `<p>Correct Answers: ${score}</p>`;
-    reportHTML += `<p>Wrong Answers: ${wrongCount}</p>`;
-    reportHTML += `<p>Score Percentage: ${percent}%</p>`;
-
-    reportHTML += `<h3>Detailed Summary:</h3><ul>`;
-    answers.forEach((ans, i) => {
-      reportHTML += `<li><b>Q${i + 1}:</b> ${ans.question}<br/>Your answer: <span style="color:${ans.isCorrect ? 'green' : 'red'};">${ans.selected} ${ans.isCorrect ? '✅' : '❌'}</span><br/>Correct answer: ${ans.correct}</li><br/>`;
-    });
-    reportHTML += `</ul>`;
-
-    reportEl.innerHTML = reportHTML;
-    reportEl.style.display = 'block';
-  }
-
-  hintBtn.onclick = () => {
-    if (hintEl.style.display === 'block') {
-      hintEl.style.display = 'none';
-      hintBtn.textContent = 'Show Hint';
-    } else {
-      hintEl.style.display = 'block';
-      hintEl.textContent = quizData[currentIndex].hint;
-      hintBtn.textContent = 'Hide Hint';
-    }
-  };
-
-  restartBtn.onclick = () => {
-    currentIndex = 0;
-    score = 0;
-    answers = [];
-    quizStartTime = null;
-    quizEndTime = null;
-    restartBtn.style.display = 'none';
-    hintBtn.style.display = 'inline-block';
-    hintBtn.disabled = false;
-    reportEl.style.display = 'none';
-    timeTakenEl.textContent = '';
-    loadQuestion();
-  };
-
-  loadQuestion();
-</script>
-
+  </script>
 </body>
 </html>
