@@ -5,245 +5,156 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Political Theory - Advanced Quiz</title>
 <style>
-  body {
-    font-family: Arial, sans-serif;
-    background: #f4f6fb;
-    margin: 0;
-    padding: 0;
-  }
-  header {
-    background: #1a237e;
-    color: #fff;
-    padding: 15px;
-    text-align: center;
-  }
-  .container {
-    max-width: 900px;
-    margin: 20px auto;
-    background: #fff;
-    padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-  }
-  .timer {
-    font-weight: bold;
-    color: #1a237e;
-    text-align: right;
-    margin-bottom: 15px;
-  }
-  .question {
-    margin-bottom: 20px;
-  }
-  .options label {
-    display: block;
-    margin: 6px 0;
-    padding: 8px;
-    border: 1px solid #ddd;
-    border-radius: 6px;
-    cursor: pointer;
-    transition: background 0.3s;
-  }
-  .options input {
-    margin-right: 10px;
-  }
-  .options label:hover {
-    background: #f1f1f1;
-  }
-  .navigation {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    margin-bottom: 20px;
-  }
-  .navigation button {
-    background: #1a237e;
-    color: #fff;
-    border: none;
-    padding: 8px 12px;
-    border-radius: 6px;
-    cursor: pointer;
-  }
-  .navigation button.visited {
-    background: #3949ab;
-  }
-  .navigation button.current {
-    border: 2px solid #ff9800;
-  }
-  button.action {
-    background: #ff9800;
-    color: #fff;
-    border: none;
-    padding: 10px 20px;
-    margin-top: 15px;
-    border-radius: 6px;
-    cursor: pointer;
-  }
-  button.action:hover {
-    background: #e68900;
-  }
-  .result {
-    margin-top: 20px;
-    font-weight: bold;
-    color: #1a237e;
-  }
+  body { font-family: Arial, sans-serif; background: #f4f6fb; margin:0; padding:0; }
+  header { background: #1a237e; color:#fff; padding:15px; text-align:center; }
+  .container { max-width: 900px; margin: 20px auto; background:#fff; border-radius:10px;
+    box-shadow:0 2px 6px rgba(0,0,0,0.1); padding:20px; position:relative; }
+  .timer { position:fixed; top:15px; right:15px; background:#1a237e; color:#fff;
+    padding:10px 15px; border-radius:6px; font-weight:bold; z-index:1000; }
+  .timer.warning { background:#e53935; }
+  .question-card { padding:20px; border-radius:8px; background:#f9f9f9; margin-bottom:20px;
+    transition: all 0.3s ease; }
+  .options label { display:block; margin:6px 0; padding:8px; border:1px solid #ddd; border-radius:6px;
+    cursor:pointer; transition: background 0.3s; }
+  .options input { margin-right:10px; }
+  .options label:hover { background:#f1f1f1; }
+  .nav-panel { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:20px; justify-content:center; }
+  .nav-panel button { padding:8px 12px; border:none; border-radius:6px; cursor:pointer; }
+  .nav-panel button.unanswered { background:#e0e0e0; }
+  .nav-panel button.answered { background:#1a237e; color:#fff; }
+  .nav-panel button.flagged { background:#ff9800; color:#fff; }
+  .nav-panel button.current { border:2px solid #ffeb3b; }
+  .actions { display:flex; justify-content:space-between; margin-top:15px; flex-wrap:wrap; gap:10px; }
+  button.action { background:#1a237e; color:#fff; border:none; padding:10px 20px; border-radius:6px; cursor:pointer; }
+  button.action:hover { background:#3949ab; }
+  button.flag-action { background:#ff9800; color:#fff; }
+  button.flag-action:hover { background:#e68900; }
+  .progress-container { width:100%; background:#ddd; border-radius:8px; margin-bottom:15px; }
+  .progress-bar { height:10px; background:#1a237e; width:0%; border-radius:8px; transition: width 0.3s; }
+  .result { margin-top:20px; font-weight:bold; color:#1a237e; }
 </style>
 </head>
 <body>
 
 <header>
-  <h1>Political Theory - Advanced Quiz</h1>
-  <p>Answer all questions. Timer is running!</p>
+<h1>Political Theory - Advanced Quiz</h1>
+<p>Answer all questions. Timer is running!</p>
 </header>
 
+<div class="timer" id="timer">Time Left: 10:00</div>
+
 <div class="container">
-  <div class="timer" id="timer">Time Left: 10:00</div>
-  <div class="navigation" id="navButtons"></div>
-  <div id="questionContainer"></div>
-  <button class="action" id="prevBtn">Previous</button>
-  <button class="action" id="nextBtn">Next</button>
-  <button class="action" id="submitBtn" style="display:none;">Submit Quiz</button>
-  <div class="result" id="result"></div>
+<div class="progress-container"><div class="progress-bar" id="progressBar"></div></div>
+<div class="nav-panel" id="navPanel"></div>
+<div id="questionContainer"></div>
+
+<div class="actions">
+<button class="action" id="prevBtn">Previous</button>
+<button class="action" id="nextBtn">Next</button>
+<button class="flag-action" id="flagBtn">Flag / Unflag</button>
+<button class="action" id="submitBtn" style="display:none;">Submit Quiz</button>
+</div>
+
+<div class="result" id="result"></div>
 </div>
 
 <script>
-// ----------------- Question Pool -----------------
-const questions = [
-  {
-    q: "Who is regarded as the father of Political Science?",
-    options: ["Plato", "Aristotle", "Cicero", "Kautilya"],
-    answer: 1
-  },
-  {
-    q: "The concept of 'Leviathan' was introduced by:",
-    options: ["Locke", "Rousseau", "Hobbes", "Montesquieu"],
-    answer: 2
-  },
-  {
-    q: "Justice as Fairness was proposed by:",
-    options: ["Rawls", "Nozick", "Sen", "Bentham"],
-    answer: 0
-  },
-  {
-    q: "Who emphasized the theory of social contract?",
-    options: ["Locke", "Hobbes", "Rousseau", "All of the above"],
-    answer: 3
-  },
-  {
-    q: "Which thinker wrote 'The Prince'?",
-    options: ["Machiavelli", "Plato", "Aristotle", "Hobbes"],
-    answer: 0
-  },
-  {
-    q: "Who developed the concept of 'Natural Rights'?",
-    options: ["Locke", "Bentham", "Marx", "Rousseau"],
-    answer: 0
-  },
-  {
-    q: "Which theory is associated with Robert Nozick?",
-    options: ["Libertarianism", "Utilitarianism", "Communitarianism", "Marxism"],
-    answer: 0
-  },
-  {
-    q: "Plato's ideal state is based on:",
-    options: ["Justice", "Equality", "Power", "Freedom"],
-    answer: 0
-  },
-  {
-    q: "Hobbes advocated:",
-    options: ["Absolute Monarchy", "Democracy", "Aristocracy", "Republic"],
-    answer: 0
-  },
-  {
-    q: "Rawls' original position relates to:",
-    options: ["Justice", "Liberty", "Equality", "Rights"],
-    answer: 0
-  }
+// -------- Question Pool --------
+const questions=[
+{q:"Who is regarded as the father of Political Science?",options:["Plato","Aristotle","Cicero","Kautilya"],answer:1},
+{q:"The concept of 'Leviathan' was introduced by:",options:["Locke","Rousseau","Hobbes","Montesquieu"],answer:2},
+{q:"Justice as Fairness was proposed by:",options:["Rawls","Nozick","Sen","Bentham"],answer:0},
+{q:"Who emphasized the theory of social contract?",options:["Locke","Hobbes","Rousseau","All of the above"],answer:3},
+{q:"Which thinker wrote 'The Prince'?",options:["Machiavelli","Plato","Aristotle","Hobbes"],answer:0},
+{q:"Who developed the concept of 'Natural Rights'?",options:["Locke","Bentham","Marx","Rousseau"],answer:0},
+{q:"Which theory is associated with Robert Nozick?",options:["Libertarianism","Utilitarianism","Communitarianism","Marxism"],answer:0},
+{q:"Plato's ideal state is based on:",options:["Justice","Equality","Power","Freedom"],answer:0},
+{q:"Hobbes advocated:",options:["Absolute Monarchy","Democracy","Aristocracy","Republic"],answer:0},
+{q:"Rawls' original position relates to:",options:["Justice","Liberty","Equality","Rights"],answer:0}
 ];
 
-// ----------------- Timer -----------------
-let timeLeft = 10*60; // 10 minutes
-const timerEl = document.getElementById('timer');
-const timerInterval = setInterval(() => {
-  let minutes = Math.floor(timeLeft / 60);
-  let seconds = timeLeft % 60;
-  timerEl.textContent = `Time Left: ${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+// -------- Variables --------
+let current=0;
+const userAnswers=Array(questions.length).fill(null);
+const flagged=Array(questions.length).fill(false);
+
+const questionContainer=document.getElementById('questionContainer');
+const navPanel=document.getElementById('navPanel');
+const prevBtn=document.getElementById('prevBtn');
+const nextBtn=document.getElementById('nextBtn');
+const submitBtn=document.getElementById('submitBtn');
+const flagBtn=document.getElementById('flagBtn');
+const resultDiv=document.getElementById('result');
+const progressBar=document.getElementById('progressBar');
+
+// -------- Timer --------
+let timeLeft=10*60;
+const timerEl=document.getElementById('timer');
+const timerInterval=setInterval(()=>{
+  let m=Math.floor(timeLeft/60),s=timeLeft%60;
+  timerEl.textContent=`Time Left: ${m}:${s<10?'0':''}${s}`;
+  if(timeLeft<=60) timerEl.classList.add('warning');
   timeLeft--;
-  if (timeLeft < 0) {
-    clearInterval(timerInterval);
-    submitQuiz();
-  }
-}, 1000);
+  if(timeLeft<0){clearInterval(timerInterval);submitQuiz();}
+},1000);
 
-// ----------------- Navigation -----------------
-let currentQuestion = 0;
-const userAnswers = Array(questions.length).fill(null);
-
-const questionContainer = document.getElementById('questionContainer');
-const navButtons = document.getElementById('navButtons');
-const prevBtn = document.getElementById('prevBtn');
-const nextBtn = document.getElementById('nextBtn');
-const submitBtn = document.getElementById('submitBtn');
-const resultDiv = document.getElementById('result');
-
-function renderNavButtons() {
-  navButtons.innerHTML = '';
+// -------- Functions --------
+function renderNav(){
+  navPanel.innerHTML='';
   questions.forEach((q,i)=>{
-    const btn = document.createElement('button');
-    btn.textContent = i+1;
-    if(userAnswers[i] !== null) btn.classList.add('visited');
-    if(i === currentQuestion) btn.classList.add('current');
-    btn.onclick = () => {currentQuestion=i; renderQuestion();};
-    navButtons.appendChild(btn);
+    const btn=document.createElement('button');
+    btn.textContent=i+1;
+    btn.className= flagged[i] ? 'flagged' : (userAnswers[i]!==null?'answered':'unanswered');
+    if(i===current) btn.classList.add('current');
+    btn.onclick=()=>{current=i; renderQuestion();};
+    navPanel.appendChild(btn);
   });
+  progressBar.style.width=`${(userAnswers.filter(a=>a!==null).length/questions.length)*100}%`;
 }
 
-function renderQuestion() {
-  const q = questions[currentQuestion];
-  let html = `<div class="question"><p>${currentQuestion+1}. ${q.q}</p><div class="options">`;
+function renderQuestion(){
+  const q=questions[current];
+  questionContainer.innerHTML=`<div class="question-card">${current+1}. ${q.q}<div class="options"></div></div>`;
+  const optionsDiv=questionContainer.querySelector('.options');
   q.options.forEach((opt,j)=>{
-    html += `<label><input type="radio" name="q" value="${j}" ${userAnswers[currentQuestion]===j ? 'checked' : ''}> ${opt}</label>`;
+    optionsDiv.innerHTML+=`<label><input type="radio" name="q" value="${j}" ${userAnswers[current]===j?'checked':''}> ${opt}</label>`;
   });
-  html += `</div></div>`;
-  questionContainer.innerHTML = html;
-  renderNavButtons();
-
-  prevBtn.style.display = currentQuestion===0?'none':'inline-block';
-  nextBtn.style.display = currentQuestion===questions.length-1?'none':'inline-block';
-  submitBtn.style.display = currentQuestion===questions.length-1?'inline-block':'none';
-
-  // Save answer on change
   document.querySelectorAll('input[name="q"]').forEach(el=>{
-    el.onchange = () => {userAnswers[currentQuestion]=parseInt(el.value); renderNavButtons();};
+    el.onchange=()=>{userAnswers[current]=parseInt(el.value); renderNav();}
   });
+  prevBtn.style.display=current===0?'none':'inline-block';
+  nextBtn.style.display=current===questions.length-1?'none':'inline-block';
+  submitBtn.style.display=current===questions.length-1?'inline-block':'none';
+  flagBtn.textContent=flagged[current]?'Unflag':'Flag / Unflag';
+  renderNav();
 }
 
-// Buttons
-prevBtn.onclick = () => {currentQuestion--; renderQuestion();}
-nextBtn.onclick = () => {currentQuestion++; renderQuestion();}
-submitBtn.onclick = () => submitQuiz();
+// -------- Button Actions --------
+prevBtn.onclick=()=>{current--; renderQuestion();}
+nextBtn.onclick=()=>{current++; renderQuestion();}
+flagBtn.onclick=()=>{flagged[current]=!flagged[current]; renderQuestion();}
+submitBtn.onclick=()=>submitQuiz();
 
+// -------- Submit Quiz --------
 function submitQuiz(){
   clearInterval(timerInterval);
-  let score=0;
-  let report='';
+  let score=0,report='';
   questions.forEach((q,i)=>{
-    const user = userAnswers[i];
-    if(user === q.answer){
-      score++;
-      report += `${i+1}. Correct<br>`;
-    } else {
-      report += `${i+1}. Incorrect (Correct: ${q.options[q.answer]})<br>`;
-    }
+    const user=userAnswers[i];
+    if(user===q.answer){score++; report+=`${i+1}. Correct${flagged[i]?' [Flagged]':''}<br>`;}
+    else{report+=`${i+1}. Incorrect (Correct: ${q.options[q.answer]})${flagged[i]?' [Flagged]':''}<br>`;}
   });
   questionContainer.innerHTML='';
-  navButtons.innerHTML='';
+  navPanel.innerHTML='';
   prevBtn.style.display='none';
   nextBtn.style.display='none';
   submitBtn.style.display='none';
-  resultDiv.innerHTML = `Your Score: ${score} / ${questions.length}<br><br>${report}`;
+  flagBtn.style.display='none';
+  progressBar.style.width='100%';
+  resultDiv.innerHTML=`<h3>Your Score: ${score} / ${questions.length}</h3><br>${report}`;
 }
 
-// Initial render
+// -------- Initial Render --------
 renderQuestion();
 </script>
 
