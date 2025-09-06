@@ -13,6 +13,7 @@ button { background:#1a237e; color:#fff; padding:10px 20px; border:none; border-
 button:hover { background:#3949ab; }
 .hint { margin-top:10px; color:#555; display:none; }
 #timer { font-weight:bold; color:red; margin-bottom:20px; text-align:center; }
+#result_info { text-align: center; margin-top: 20px; font-weight: bold; }
 </style>
 </head>
 <body>
@@ -21,11 +22,12 @@ button:hover { background:#3949ab; }
 <div id="quiz-container"></div>
 <button onclick="nextBatch()">Next Batch (29 Questions)</button>
 <button onclick="refreshQuiz()">🔄 Refresh Quiz</button>
+<div id="result_info"></div>
 
 <script>
 // ===================== QUESTIONS =====================
 const allQuestions = [
-  // ======= Sample Questions =======
+  // ======= Sample Questions (Data Corrected) =======
   {
     id: "sample1",
     year: 2004,
@@ -40,11 +42,10 @@ const allQuestions = [
     paper: "Paper 1 + Political Science",
     question: "In a constituency with 50,000 voters, Party A received 45% votes, Party B received 30% votes, and Party C received 25% votes. If 20% of Party A's voters and 15% of Party B's voters switch to Party C in the next election, what percentage of votes will Party C receive?",
     options: ["34%", "38%", "42%", "46%"],
-    answer: 2,
-    hint: "Calculate vote transfers: Party A loses 45% × 20% = 9%, Party B loses 30% × 15% = 4.5%",
+    answer: 1,
+    hint: "Calculate vote transfers: Party A loses 45% × 20% = 9%, Party B loses 30% × 15% = 4.5%.",
     explanation: "Party C originally had 25%. Gains: 9% + 4.5% = 13.5%. New total: 25% + 13.5% = 38.5% ≈ 38%"
   },
-  
   {
     id: "reasoning_pol_1",
     year: 2023,
@@ -55,7 +56,6 @@ const allQuestions = [
     hint: "Consider the parallel relationship between governance systems and their power distribution",
     explanation: "Democracy emphasizes majority rule, while autocracy concentrates power in a single authority or ruler"
   },
-
   {
     id: "advanced_pol_1",
     year: 2024,
@@ -66,7 +66,6 @@ const allQuestions = [
     hint: "This relates to Arrow's impossibility theorem and collective decision-making",
     explanation: "Social Choice Theory examines how individual preferences aggregate into collective decisions, including altruistic voting behavior"
   },
-
   {
     id: "data_interpretation_1",
     year: 2023,
@@ -74,10 +73,9 @@ const allQuestions = [
     question: "A survey shows: 60% support Policy X, 40% support Policy Y, and 25% support both. What percentage supports neither policy?",
     options: ["15%", "25%", "35%", "45%"],
     answer: 1,
-    hint: "Use the principle of inclusion-exclusion: Total = X + Y - Both",
+    hint: "Use the principle of inclusion-exclusion: P(X or Y) = P(X) + P(Y) - P(X and Y).",
     explanation: "Those supporting at least one policy: 60% + 40% - 25% = 75%. Therefore, 100% - 75% = 25% support neither"
   },
-
   {
     id: "comparative_pol_1",
     year: 2024,
@@ -88,7 +86,6 @@ const allQuestions = [
     hint: "This scholar identified three distinct waves of democratization in modern history",
     explanation: "Samuel Huntington coined the term 'Third Wave' in his seminal work analyzing global democratization patterns"
   },
-
   {
     id: "math_statistics_1",
     year: 2023,
@@ -99,7 +96,6 @@ const allQuestions = [
     hint: "Convert 520/1000 to percentage first, then apply the margin of error",
     explanation: "520/1000 = 52%. With ±3% margin of error: 52% - 3% = 49%, 52% + 3% = 55%"
   },
-
   {
     id: "indian_polity_1",
     year: 2024,
@@ -110,7 +106,6 @@ const allQuestions = [
     hint: "This emergency relates to the financial stability or credit of India",
     explanation: "Article 360 deals with Financial Emergency, which can be imposed when the financial stability or credit of India is threatened"
   },
-
   {
     id: "logical_reasoning_1",
     year: 2023,
@@ -119,9 +114,8 @@ const allQuestions = [
     options: ["All politicians are corrupt", "Some politicians are corrupt", "No politicians are corrupt", "Cannot be determined"],
     answer: 3,
     hint: "Consider whether the given premises provide sufficient information for a definitive conclusion",
-    explanation: "The premises don't establish any direct relationship between politicians and corruption, making a definitive conclusion impossible"
+    explanation: "The premises do not establish a direct link between the group of leaders who are politicians and the group of leaders who are corrupt. Therefore, a definitive conclusion cannot be drawn."
   },
-
   {
     id: "international_relations_1",
     year: 2024,
@@ -132,7 +126,6 @@ const allQuestions = [
     hint: "Consider what structural condition makes power balancing necessary in international politics",
     explanation: "Anarchy (absence of world government) creates the security dilemma that necessitates balance of power mechanisms"
   },
-
   {
     id: "research_methodology_1",
     year: 2023,
@@ -143,7 +136,6 @@ const allQuestions = [
     hint: "Type II error is also known as 'false negative' - missing something that's actually there",
     explanation: "Type II error (β error) occurs when we fail to reject a false null hypothesis, missing a real effect"
   },
-
   {
     id: "political_theory_advanced_1",
     year: 2024,
@@ -154,7 +146,6 @@ const allQuestions = [
     hint: "Rawls was particularly concerned with justice for the least advantaged in society",
     explanation: "The difference principle permits inequalities only if they work to the benefit of the least advantaged members of society"
   },
-
   {
     id: "comprehension_analysis_1",
     year: 2023,
@@ -164,8 +155,8 @@ const allQuestions = [
     answer: 2,
     hint: "The word 'both' indicates equal importance of different types of factors",
     explanation: "The statement emphasizes that successful democratization needs both formal institutional structures and informal cultural adaptations"
-  }
-    {
+  },
+  {
     "id": "q2024_001",
     "year": 2024,
     "question": "Who is considered the father of modern psychology?",
@@ -352,15 +343,15 @@ const allQuestions = [
     "hint": "Second President of the United States.",
     "subject": "Political Science",
     "source": "papers/2024_rule_of_law.html"
-  }
- {
+  },
+  {
     id: "q3",
     year: 2005,
     question: "The concept of 'Hegemony' was elaborated by?",
     options: ["Karl Marx", "Max Weber", "Antonio Gramsci", "David Easton"],
     answer: 2,
     hint: "Italian Marxist, wrote Prison Notebooks."
-  }
+  },
   {
     id: "sample2",
     year: 2005,
@@ -374,42 +365,56 @@ const allQuestions = [
 // ======= Placeholder Questions (998) =======
 for(let i=1;i<=998;i++){
   allQuestions.push({
-    id: "q"+i,
-    year: 2004 + (i % 22), // cycles from 2004-2025
+    id: "q_placeholder_"+i,
+    year: 2004 + (i % 22),
     question: "Question placeholder #" + i,
     options: ["Option A","Option B","Option C","Option D"],
-    answer: 0, // default correct option, editable
+    answer: 0,
     hint: "Hint for question #" + i
   });
 }
 
 // ===================== QUIZ LOGIC =====================
-let usedQuestions = new Set();
+let shuffledQuestions = [];
+let currentIndex = 0;
 const batchSize = 29;
 let timerInterval;
 
-function startQuiz() {
-  document.getElementById("quiz-container").innerHTML = "";
-  const selected = [];
-  while(selected.length < batchSize && usedQuestions.size < allQuestions.length){
-    const q = allQuestions[Math.floor(Math.random()*allQuestions.length)];
-    if(!usedQuestions.has(q.id)){
-      usedQuestions.add(q.id);
-      selected.push(q);
-    }
+// Fisher-Yates shuffle algorithm for question randomization
+function shuffleArray(array) {
+  for (let i = array.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [array[i], array[j]] = [array[j], array[i]];
   }
-  renderQuestions(selected);
-  startTimer(1800); // 30 mins
 }
 
-function renderQuestions(questions){
+function startQuiz() {
+  if (shuffledQuestions.length === 0) {
+    shuffledQuestions = [...allQuestions];
+    shuffleArray(shuffledQuestions);
+    currentIndex = 0;
+  }
+  
+  document.getElementById("quiz-container").innerHTML = "";
+  const selected = shuffledQuestions.slice(currentIndex, currentIndex + batchSize);
+  currentIndex += selected.length;
+  
+  renderQuestions(selected);
+  startTimer(1800); // 30 mins
+  updateResultInfo();
+}
+
+function renderQuestions(questions) {
   const container = document.getElementById("quiz-container");
-  questions.forEach((q,index)=>{
+  questions.forEach((q, index) => {
     const box = document.createElement("div");
-    box.className="question-box";
-    box.innerHTML=`
-      <p><b>Q${index+1}:</b> ${q.question}</p>
-      ${q.options.map((opt,i)=>`<label><input type="radio" name="${q.id}" value="${i}"> ${opt}</label>`).join("")}
+    box.className = "question-box";
+    const questionNumber = currentIndex - questions.length + index + 1;
+    box.innerHTML = `
+      <p><b>Q${questionNumber}:</b> ${q.question}</p>
+      <div class="options">
+        ${q.options.map((opt, i) => `<label><input type="radio" name="${q.id}" value="${i}"> ${opt}</label>`).join("")}
+      </div>
       <button onclick="checkAnswer('${q.id}',${q.answer})">Submit</button>
       <button onclick="showHint('${q.id}')">Hint</button>
       <p id="hint_${q.id}" class="hint">${q.hint}</p>
@@ -419,51 +424,66 @@ function renderQuestions(questions){
   });
 }
 
-function checkAnswer(qId, correct){
+function checkAnswer(qId, correct) {
   const selected = document.querySelector(`input[name="${qId}"]:checked`);
-  if(!selected){ alert("Please select an answer."); return; }
-  const result = document.getElementById("result_"+qId);
-  if(parseInt(selected.value)===correct){
-    result.textContent="✅ Correct!";
-    result.style.color="green";
+  const result = document.getElementById("result_" + qId);
+  const correctOption = allQuestions.find(q => q.id === qId).options[correct];
+  
+  if (!selected) {
+    result.textContent = "Please select an answer.";
+    result.style.color = "orange";
+    return;
+  }
+
+  if (parseInt(selected.value) === correct) {
+    result.textContent = "✅ Correct!";
+    result.style.color = "green";
   } else {
-    result.textContent="❌ Wrong! Correct: "+allQuestions.find(q=>q.id===qId).options[correct];
-    result.style.color="red";
+    result.textContent = `❌ Wrong! The correct answer is: ${correctOption}`;
+    result.style.color = "red";
   }
 }
 
-function showHint(qId){
-  document.getElementById("hint_"+qId).style.display="block";
+function showHint(qId) {
+  document.getElementById("hint_" + qId).style.display = "block";
 }
 
-function nextBatch(){
-  if(usedQuestions.size >= allQuestions.length){
-    alert("🎉 You completed all questions!");
+function nextBatch() {
+  if (currentIndex >= allQuestions.length) {
+    alert("🎉 You've completed all the questions!");
     return;
   }
   startQuiz();
 }
 
-function refreshQuiz(){
-  usedQuestions.clear();
+function refreshQuiz() {
+  shuffledQuestions = [];
+  currentIndex = 0;
   startQuiz();
 }
 
-function startTimer(seconds){
+function startTimer(seconds) {
   clearInterval(timerInterval);
   let timeLeft = seconds;
   const timerElement = document.getElementById("time");
-  timerInterval = setInterval(()=>{
-    if(timeLeft>0){
+  timerInterval = setInterval(() => {
+    if (timeLeft > 0) {
       timeLeft--;
-      const min = Math.floor(timeLeft/60);
-      const sec = timeLeft%60;
-      timerElement.textContent=`${String(min).padStart(2,"0")}:${String(sec).padStart(2,"0")}`;
+      const min = Math.floor(timeLeft / 60);
+      const sec = timeLeft % 60;
+      timerElement.textContent = `${String(min).padStart(2, "0")}:${String(sec).padStart(2, "0")}`;
     } else {
       clearInterval(timerInterval);
       alert("⏰ Time's up!");
     }
-  },1000);
+  }, 1000);
+}
+
+function updateResultInfo() {
+    const info = document.getElementById("result_info");
+    const questionsRemaining = allQuestions.length - currentIndex;
+    const questionsLoaded = Math.min(currentIndex, allQuestions.length);
+    info.textContent = `Showing questions ${questionsLoaded - batchSize + 1} - ${questionsLoaded}. Questions remaining: ${questionsRemaining}.`;
 }
 
 // Initialize quiz on page load
