@@ -1,126 +1,251 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Political Theory - Quiz 1</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #f4f6fb;
-      margin: 0; padding: 0;
-    }
-    header {
-      background: #1a237e;
-      color: #fff;
-      padding: 15px;
-      text-align: center;
-    }
-    .container {
-      max-width: 800px;
-      margin: 30px auto;
-      background: #fff;
-      border-radius: 10px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-      padding: 20px;
-    }
-    .question {
-      margin-bottom: 20px;
-    }
-    .options label {
-      display: block;
-      margin: 5px 0;
-      padding: 8px;
-      border: 1px solid #ddd;
-      border-radius: 6px;
-      cursor: pointer;
-      transition: background 0.3s;
-    }
-    .options input {
-      margin-right: 10px;
-    }
-    .options label:hover {
-      background: #f1f1f1;
-    }
-    button {
-      background: #1a237e;
-      color: #fff;
-      border: none;
-      padding: 10px 20px;
-      border-radius: 6px;
-      cursor: pointer;
-      margin-top: 15px;
-    }
-    button:hover {
-      background: #3949ab;
-    }
-    .result {
-      margin-top: 20px;
-      font-weight: bold;
-      color: #1a237e;
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Political Theory - Advanced Quiz</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    background: #f4f6fb;
+    margin: 0;
+    padding: 0;
+  }
+  header {
+    background: #1a237e;
+    color: #fff;
+    padding: 15px;
+    text-align: center;
+  }
+  .container {
+    max-width: 900px;
+    margin: 20px auto;
+    background: #fff;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  }
+  .timer {
+    font-weight: bold;
+    color: #1a237e;
+    text-align: right;
+    margin-bottom: 15px;
+  }
+  .question {
+    margin-bottom: 20px;
+  }
+  .options label {
+    display: block;
+    margin: 6px 0;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background 0.3s;
+  }
+  .options input {
+    margin-right: 10px;
+  }
+  .options label:hover {
+    background: #f1f1f1;
+  }
+  .navigation {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 20px;
+  }
+  .navigation button {
+    background: #1a237e;
+    color: #fff;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+  }
+  .navigation button.visited {
+    background: #3949ab;
+  }
+  .navigation button.current {
+    border: 2px solid #ff9800;
+  }
+  button.action {
+    background: #ff9800;
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    margin-top: 15px;
+    border-radius: 6px;
+    cursor: pointer;
+  }
+  button.action:hover {
+    background: #e68900;
+  }
+  .result {
+    margin-top: 20px;
+    font-weight: bold;
+    color: #1a237e;
+  }
+</style>
 </head>
 <body>
-  <header>
-    <h1>Political Theory - Quiz 1</h1>
-  </header>
 
-  <div class="container">
-    <form id="quizForm">
+<header>
+  <h1>Political Theory - Advanced Quiz</h1>
+  <p>Answer all questions. Timer is running!</p>
+</header>
 
-      <div class="question">
-        <p>1. Who is regarded as the father of modern political science?</p>
-        <div class="options">
-          <label><input type="radio" name="q1" value="A"> Plato</label>
-          <label><input type="radio" name="q1" value="B"> Aristotle</label>
-          <label><input type="radio" name="q1" value="C"> Machiavelli</label>
-          <label><input type="radio" name="q1" value="D"> Hobbes</label>
-        </div>
-      </div>
+<div class="container">
+  <div class="timer" id="timer">Time Left: 10:00</div>
+  <div class="navigation" id="navButtons"></div>
+  <div id="questionContainer"></div>
+  <button class="action" id="prevBtn">Previous</button>
+  <button class="action" id="nextBtn">Next</button>
+  <button class="action" id="submitBtn" style="display:none;">Submit Quiz</button>
+  <div class="result" id="result"></div>
+</div>
 
-      <div class="question">
-        <p>2. The concept of 'Leviathan' was introduced by:</p>
-        <div class="options">
-          <label><input type="radio" name="q2" value="A"> John Locke</label>
-          <label><input type="radio" name="q2" value="B"> Rousseau</label>
-          <label><input type="radio" name="q2" value="C"> Hobbes</label>
-          <label><input type="radio" name="q2" value="D"> Montesquieu</label>
-        </div>
-      </div>
+<script>
+// ----------------- Question Pool -----------------
+const questions = [
+  {
+    q: "Who is regarded as the father of Political Science?",
+    options: ["Plato", "Aristotle", "Cicero", "Kautilya"],
+    answer: 1
+  },
+  {
+    q: "The concept of 'Leviathan' was introduced by:",
+    options: ["Locke", "Rousseau", "Hobbes", "Montesquieu"],
+    answer: 2
+  },
+  {
+    q: "Justice as Fairness was proposed by:",
+    options: ["Rawls", "Nozick", "Sen", "Bentham"],
+    answer: 0
+  },
+  {
+    q: "Who emphasized the theory of social contract?",
+    options: ["Locke", "Hobbes", "Rousseau", "All of the above"],
+    answer: 3
+  },
+  {
+    q: "Which thinker wrote 'The Prince'?",
+    options: ["Machiavelli", "Plato", "Aristotle", "Hobbes"],
+    answer: 0
+  },
+  {
+    q: "Who developed the concept of 'Natural Rights'?",
+    options: ["Locke", "Bentham", "Marx", "Rousseau"],
+    answer: 0
+  },
+  {
+    q: "Which theory is associated with Robert Nozick?",
+    options: ["Libertarianism", "Utilitarianism", "Communitarianism", "Marxism"],
+    answer: 0
+  },
+  {
+    q: "Plato's ideal state is based on:",
+    options: ["Justice", "Equality", "Power", "Freedom"],
+    answer: 0
+  },
+  {
+    q: "Hobbes advocated:",
+    options: ["Absolute Monarchy", "Democracy", "Aristocracy", "Republic"],
+    answer: 0
+  },
+  {
+    q: "Rawls' original position relates to:",
+    options: ["Justice", "Liberty", "Equality", "Rights"],
+    answer: 0
+  }
+];
 
-      <div class="question">
-        <p>3. “Justice as Fairness” is a theory proposed by:</p>
-        <div class="options">
-          <label><input type="radio" name="q3" value="A"> John Rawls</label>
-          <label><input type="radio" name="q3" value="B"> Robert Nozick</label>
-          <label><input type="radio" name="q3" value="C"> Amartya Sen</label>
-          <label><input type="radio" name="q3" value="D"> Bentham</label>
-        </div>
-      </div>
+// ----------------- Timer -----------------
+let timeLeft = 10*60; // 10 minutes
+const timerEl = document.getElementById('timer');
+const timerInterval = setInterval(() => {
+  let minutes = Math.floor(timeLeft / 60);
+  let seconds = timeLeft % 60;
+  timerEl.textContent = `Time Left: ${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+  timeLeft--;
+  if (timeLeft < 0) {
+    clearInterval(timerInterval);
+    submitQuiz();
+  }
+}, 1000);
 
-      <button type="button" onclick="checkAnswers()">Submit Quiz</button>
-    </form>
+// ----------------- Navigation -----------------
+let currentQuestion = 0;
+const userAnswers = Array(questions.length).fill(null);
 
-    <div class="result" id="result"></div>
-  </div>
+const questionContainer = document.getElementById('questionContainer');
+const navButtons = document.getElementById('navButtons');
+const prevBtn = document.getElementById('prevBtn');
+const nextBtn = document.getElementById('nextBtn');
+const submitBtn = document.getElementById('submitBtn');
+const resultDiv = document.getElementById('result');
 
-  <script>
-    function checkAnswers() {
-      const answers = { q1: "B", q2: "C", q3: "A" };
-      let score = 0;
-      let total = Object.keys(answers).length;
+function renderNavButtons() {
+  navButtons.innerHTML = '';
+  questions.forEach((q,i)=>{
+    const btn = document.createElement('button');
+    btn.textContent = i+1;
+    if(userAnswers[i] !== null) btn.classList.add('visited');
+    if(i === currentQuestion) btn.classList.add('current');
+    btn.onclick = () => {currentQuestion=i; renderQuestion();};
+    navButtons.appendChild(btn);
+  });
+}
 
-      for (let key in answers) {
-        let selected = document.querySelector(`input[name="${key}"]:checked`);
-        if (selected && selected.value === answers[key]) {
-          score++;
-        }
-      }
+function renderQuestion() {
+  const q = questions[currentQuestion];
+  let html = `<div class="question"><p>${currentQuestion+1}. ${q.q}</p><div class="options">`;
+  q.options.forEach((opt,j)=>{
+    html += `<label><input type="radio" name="q" value="${j}" ${userAnswers[currentQuestion]===j ? 'checked' : ''}> ${opt}</label>`;
+  });
+  html += `</div></div>`;
+  questionContainer.innerHTML = html;
+  renderNavButtons();
 
-      document.getElementById("result").innerText =
-        `You scored ${score} out of ${total}`;
+  prevBtn.style.display = currentQuestion===0?'none':'inline-block';
+  nextBtn.style.display = currentQuestion===questions.length-1?'none':'inline-block';
+  submitBtn.style.display = currentQuestion===questions.length-1?'inline-block':'none';
+
+  // Save answer on change
+  document.querySelectorAll('input[name="q"]').forEach(el=>{
+    el.onchange = () => {userAnswers[currentQuestion]=parseInt(el.value); renderNavButtons();};
+  });
+}
+
+// Buttons
+prevBtn.onclick = () => {currentQuestion--; renderQuestion();}
+nextBtn.onclick = () => {currentQuestion++; renderQuestion();}
+submitBtn.onclick = () => submitQuiz();
+
+function submitQuiz(){
+  clearInterval(timerInterval);
+  let score=0;
+  let report='';
+  questions.forEach((q,i)=>{
+    const user = userAnswers[i];
+    if(user === q.answer){
+      score++;
+      report += `${i+1}. Correct<br>`;
+    } else {
+      report += `${i+1}. Incorrect (Correct: ${q.options[q.answer]})<br>`;
     }
-  </script>
+  });
+  questionContainer.innerHTML='';
+  navButtons.innerHTML='';
+  prevBtn.style.display='none';
+  nextBtn.style.display='none';
+  submitBtn.style.display='none';
+  resultDiv.innerHTML = `Your Score: ${score} / ${questions.length}<br><br>${report}`;
+}
+
+// Initial render
+renderQuestion();
+</script>
+
 </body>
 </html>
