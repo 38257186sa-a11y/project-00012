@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>NTA-UGC NET Political Science Quiz 2013</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background: #f4f4f9;
+        margin: 0;
+        padding: 20px;
+    }
+    h1 {
+        text-align: center;
+        color: #333;
+    }
+    .quiz-container {
+        max-width: 900px;
+        margin: 20px auto;
+        background: #fff;
+        padding: 25px;
+        border-radius: 10px;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+    .question {
+        margin: 20px 0 8px 0;
+        font-weight: bold;
+    }
+    .options label {
+        display: block;
+        margin: 8px 0;
+        cursor: pointer;
+        font-weight: normal;
+    }
+    .button-wrap {
+        text-align: center;
+        margin-top: 20px;
+    }
+    button {
+        margin: 10px 5px 0 5px;
+        padding: 10px 20px;
+        background: #007bff;
+        border: none;
+        color: #fff;
+        font-size: 16px;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background 0.2s;
+    }
+    button:hover:enabled {
+        background: #0056b3;
+    }
+    button:disabled {
+        background: #adb3be;
+    }
+    .result {
+        margin-top: 20px;
+        padding: 15px;
+        background: #e2e2f0;
+        border-radius: 8px;
+        font-weight: bold;
+        text-align: center;
+        font-size: 18px;
+        color: #333;
+    }
+    #detailedReport {
+        margin-top: 25px;
+        background: #fff;
+        padding: 15px 20px;
+        border-radius: 8px;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+        max-width: 950px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+    #detailedReport .question {
+        margin: 18px 0 4px 0;
+        font-weight: bold;
+    }
+    #detailedReport span, #detailedReport strong {
+        display: block;
+        margin: 2px 0;
+        font-weight: normal;
+    }
+    #detailedReport hr {
+        border: 0;
+        border-top: 1px solid #eee;
+        margin: 14px 0;
+    }
+</style>
+</head>
+<body>
+<h1>NTA-UGC NET Political Science Quiz 2024</h1>
+<div class="quiz-container" id="quiz"></div>
+<div class="button-wrap">
+    <button id="submitBtn">Submit</button>
+    <button id="reportBtn" style="display:none;">Get Detailed Report</button>
+</div>
+<div class="result" id="result"></div>
+<div id="detailedReport"></div>
+<script>
+// Questions and answers (sample with a few entries for brevity; add all)
+const quizData = [
+  {
+    "question_number": 1,
+    "question": "Who is known as the 'Father of Political Science'?",
+    "options": ["Aristotle", "Plato", "Machiavelli", "Hobbes"],
+    "answer": "Aristotle",
+    "hint": "Think of the philosopher who wrote 'Politics'.",
+    "justification": "Aristotle is often referred to as the 'Father of Political Science' due to his systematic study of political systems in his work 'Politics'."
+  },
+  {
+    "question_number": 2,
+    "question": "Which of the following is a key feature of a 'Unitary State'?",
+    "options": ["Centralized authority", "Division of powers", "Dual citizenship", "Multiple legislatures"],
+    "answer": "Centralized authority",
+    "hint": "Think of a country where central government holds supreme power.",
+    "justification": "In a unitary state, the central government holds the primary authority, with any administrative divisions deriving powers from it."
+  },
+  {
+    "question_number": 3,
+    "question": "The 'Social Contract' theory was proposed by which philosopher?",
+    "options": ["John Locke", "Thomas Hobbes", "Jean-Jacques Rousseau", "Karl Marx"],
+    "answer": "Jean-Jacques Rousseau",
+    "hint": "Think of the author of 'The Social Contract'.",
+    "justification": "Rousseau's 'The Social Contract' (1762) introduced the idea that legitimate political authority comes from a contract agreed upon by all citizens."
+  },
+  {
+    "question_number": 4,
+    "question": "Which political thinker is associated with the concept of 'The End of History'?",
+    "options": ["Francis Fukuyama", "Samuel Huntington", "Karl Marx", "Max Weber"],
+    "answer": "Francis Fukuyama",
+    "hint": "Think of the author of 'The End of History and the Last Man'.",
+    "justification": "Fukuyama argued that liberal democracy might signal the endpoint of humanity's ideological evolution."
+  },
+  {
+    "question_number": 5,
+    "question": "Who introduced the concept of 'The Iron Law of Oligarchy'?",
+    "options": ["Robert Michels", "Max Weber", "Karl Marx", "Antonio Gramsci"],
+    "answer": "Robert Michels",
+    "hint": "Think of the author of 'Political Parties'.",
+    "justification": "Michels' 'Political Parties' (1911) posited that all organizations, regardless of their democratic ideals, will inevitably develop oligarchic structures."
+  },
+  {
+    "question_number": 6,
+    "question": "The 'Theory of the Leisure Class' was written by which economist?",
+    "options": ["Thorstein Veblen", "John Maynard Keynes", "Adam Smith", "Karl Marx"],
+    "answer": "Thorstein Veblen",
+    "hint": "Think of the economist who introduced the term 'conspicuous consumption'.",
+    "justification": "Veblen's 'The Theory of the Leisure Class' (1899) critiqued the social and economic implications of the leisure class's consumption patterns."
+  },
+  {
+    "question_number": 7,
+    "question": "Which of the following is a characteristic of a 'Presidential System'?",
+    "options": ["Separation of powers", "Fusion of powers", "Collective executive", "Dual citizenship"],
+    "answer": "Separation of powers",
+    "hint": "Think of a system where the executive is separate from the legislature.",
+    "justification": "In a presidential system, the executive branch is separate from the legislative branch, as seen in the United States."
+  },
+  {
+    "question_number": 8,
+    "question": "The 'Theory of Justice' was proposed by which philosopher?",
+    "options": ["John Rawls", "Robert Nozick", "Amartya Sen", "Karl Marx"],
+    "answer": "John Rawls",
+    "hint": "Think of the author of 'A Theory of Justice'.",
+    "justification": "Rawls' 'A Theory of Justice' (1971) introduced principles of justice based on fairness and equality."
+  },
+  {
+    "question_number": 9,
+    "question": "Who is known for the concept of 'The Spirit of the Laws'?",
+    "options": ["Montesquieu", "Rousseau", "Locke", "Hobbes"],
+    "answer": "Montesquieu",
+    "hint": "Think of the author of 'De l'esprit des lois'.",
+    "justification": "Montesquieu's 'The Spirit of the Laws' (1748) analyzed various political systems and advocated for the separation of powers."
+  },
+  {
+    "question_number": 10,
+    "question": "Which political thinker is associated with the concept of 'The General Will'?",
+    "options": ["Jean-Jacques Rousseau", "Thomas Hobbes", "John Locke", "Karl Marx"],
+    "answer": "Jean-Jacques Rousseau",
+    "hint": "Think of the author of 'The Social Contract'.",
+    "justification": "Rousseau's 'The Social Contract' (1762) introduced the idea of the 'General Will' as the collective will of the people."
+  },
+  {
+    "question_number": 11,
+    "question": "Who is known as the 'Father of Modern Political Science'?",
+    "options": ["Niccolò Machiavelli", "Thomas Hobbes", "John Locke", "Karl Marx"],
+    "answer": "Niccolò Machiavelli",
+    "hint": "Think of the author of 'The Prince'.",
+    "justification": "Machiavelli's 'The Prince' (1532) laid the groundwork for modern political theory by analyzing political power and statecraft."
+  },
+  {
+    "question_number": 12,
+    "question": "Which of the following is a feature of a 'Parliamentary System'?",
+    "options": ["Fusion of powers", "Separation of powers", "Collective executive", "Dual citizenship"],
+    "answer": "Fusion of powers",
+    "hint": "Think of a system where the executive is drawn from the legislature.",
+    "justification": "In a parliamentary system, the executive branch derives its legitimacy from the legislature and is accountable to it."
+  },
+  {
+    "question_number": 13,
+    "question": "The 'Theory of the State' was proposed by which philosopher?",
+    "options": ["Hegel", "Marx", "Locke", "Hobbes"],
+    "answer": "Hegel",
+    "hint": "Think of the philosopher who introduced the concept of the state as a rational entity.",
+    "justification": "Hegel's philosophy viewed the state as the realization of ethical life and the embodiment of rational freedom."
+  },
+  {
+    "question_number": 14,
+    "question": "Match List-I (Type of Government) with List-II (Principal Attributes): a. Military Regime b. Dynastic Regime c. Pseudo Democracy d. Liberal Democracy; i. Based on deference ii. Based on coercion iii. Trappings of a liberal democracy but power rests in hands of oligarchy iv. Voluntary participation in government process is extensive",
+    "options": ["a-i, b-ii, c-iii, d-iv", "a-ii, b-i, c-iii, d-iv", "a-iv, b-iii, c-ii, d-i", "a-iii, b-i, c-iv, d-ii"],
+    "answer": "a-ii, b-i, c-iii, d-iv",
+    "hint": "Consider the dominant authority and citizen participation in each regime.",
+    "justification": "Military Regime relies on coercion (ii), Dynastic Regime on deference (i), Pseudo-Democracy has liberal trappings but oligarchic control (iii), Liberal Democracy has extensive voluntary participation (iv)."
+  },
+  {
+    "question_number": 15,
+    "question": "Who among the following was the author of the book 'Democracy in India'?",
+    "options": ["Rajni Kothari", "M.N. Srinivas", "B.R. Ambedkar", "Jawaharlal Nehru"],
+    "answer": "Rajni Kothari",
+    "hint": "Consider the key political scientist who analyzed post-independence Indian democracy.",
+    "justification": "Rajni Kothari's 'Democracy in India' (1970) is a seminal work analyzing the functioning, challenges, and political processes of Indian democracy."
+  },
+  {
+    "question_number": 16,
+    "question": "The term 'Globalization' in political science is primarily associated with:",
+    "options": ["Economic Integration", "Political Ideology", "Cultural Nationalism", "Socialism"],
+    "answer": "Economic Integration",
+    "hint": "Think of cross-border interactions and international markets.",
+    "justification": "Globalization refers to increased interconnectedness, especially economic integration, across nations, affecting politics, economy, and culture."
+  },
+  {
+    "question_number": 17,
+    "question": "Who propounded the theory of 'Elitism' in political science?",
+    "options": ["Gaetano Mosca", "Robert Dahl", "David Easton", "Seymour Martin Lipset"],
+    "answer": "Gaetano Mosca",
+    "hint": "Focus on the early 20th-century theorists on ruling classes.",
+    "justification": "Mosca, in 'The Ruling Class' (1896), argued that all societies are ruled by a minority elite, marking the foundation of elitist theory in political science."
+  },
+  {
+    "question_number": 18,
+    "question": "The concept of 'Civil Society' is most closely associated with which thinker?",
+    "options": ["Antonio Gramsci", "Karl Marx", "John Rawls", "Max Weber"],
+    "answer": "Antonio Gramsci",
+    "hint": "Think of the relationship between the state and social groups.",
+    "justification": "Gramsci emphasized civil society as a space where ideas and ideologies shape consent and hegemony, forming a crucial link between the state and social forces."
+  },
+  {
+    "question_number": 19,
+    "question": "Which of the following is a main feature of the 'Behavioural Approach' in political science?",
+    "options": ["Focus on institutions", "Focus on empirical data and human behavior", "Focus on historical evolution", "Focus on legal frameworks"],
+    "answer": "Focus on empirical data and human behavior",
+    "hint": "Think of scientific study of politics in the mid-20th century.",
+    "justification": "Behaviouralism emphasizes systematic, empirical, and quantitative study of individual and group political behavior rather than institutions alone."
+  },
+  {
+    "question_number": 20,
+    "question": "The 'Two-Plus-Two Problem' in political theory refers to:",
+    "options": ["Decision-making paradox", "Majority-minority conflict", "Conflict between local and national government", "Ambiguity in rational choice"],
+    "answer": "Decision-making paradox",
+    "hint": "Think in terms of game theory or strategic choice.",
+    "justification": "The 'Two-Plus-Two Problem' illustrates paradoxes in decision-making, often used in rational choice analysis in political science."
+  },
+  {
+    "question_number": 21,
+    "question": "Who is regarded as the father of modern sociology and contributed to the development of political sociology?",
+    "options": ["Emile Durkheim", "Max Weber", "Karl Marx", "Alexis de Tocqueville"],
+    "answer": "Max Weber",
+    "hint": "Consider the link between bureaucracy, authority, and sociology.",
+    "justification": "Max Weber's work on authority types, bureaucracy, and rationalization profoundly influenced political sociology, earning him recognition as a foundational figure."
+  },
+  {
+    "question_number": 22,
+    "question": "The 'Second Shift' theory in political science and sociology deals with:",
+    "options": ["Gendered division of labor at home and work", "Global economic inequality", "Democracy and civil rights", "Electoral participation patterns"],
+    "answer": "Gendered division of labor at home and work",
+    "hint": "Think about Arlie Hochschild's research on working women.",
+    "justification": "Arlie Hochschild's 'Second Shift' (1989) discusses how employed women manage household responsibilities in addition to formal work, highlighting gendered labor inequalities."
+  },
+  {
+    "question_number": 23,
+    "question": "Who authored the book 'The End of History and the Last Man'?",
+    "options": ["Francis Fukuyama", "Samuel Huntington", "John Rawls", "Robert Nozick"],
+    "answer": "Francis Fukuyama",
+    "hint": "Think post-Cold War optimism in liberal democracy.",
+    "justification": "Francis Fukuyama argued in 'The End of History and the Last Man' (1992) that liberal democracy may constitute the endpoint of sociopolitical evolution."
+  },
+  {
+    "question_number": 24,
+    "question": "The term 'Post-Behaviouralism' was coined to:",
+    "options": ["Return to normative analysis", "Emphasize quantitative methods", "Focus exclusively on institutions", "Reject empirical research"],
+    "answer": "Return to normative analysis",
+    "hint": "Think about political science in the late 1960s.",
+    "justification": "Post-behaviouralism sought to address criticism of behaviouralism's neglect of normative issues, reintroducing value-oriented and policy-relevant study of politics."
+  },
+  {
+    "question_number": 25,
+    "question": "Which thinker is associated with 'Communicative Rationality'?",
+    "options": ["Jürgen Habermas", "Michel Foucault", "Hannah Arendt", "John Rawls"],
+    "answer": "Jürgen Habermas",
+    "hint": "Focus on deliberative democracy and discourse ethics.",
+    "justification": "Habermas introduced communicative rationality, emphasizing reasoned discourse as a basis for legitimacy and democratic deliberation."
+  },
+  {
+    "question_number": 26,
+    "question": "Which one of the following is a primary objective of the 74th Constitutional Amendment Act?",
+    "options": ["Strengthening Urban Local Bodies", "Decentralization in Panchayati Raj", "Reservation of seats in Parliament", "Judicial reforms"],
+    "answer": "Strengthening Urban Local Bodies",
+    "hint": "Focus on urban governance reforms.",
+    "justification": "The 74th Amendment (1992) aimed at creating a framework for urban local self-government, including municipalities and municipal corporations."
+  },
+  {
+    "question_number": 27,
+    "question": "Who formulated the 'Theory of Political Development' emphasizing modernization and social mobilization?",
+    "options": ["Gabriel Almond", "Seymour Martin Lipset", "Samuel Huntington", "David Easton"],
+    "answer": "Samuel Huntington",
+    "hint": "Focus on political order and modernization in the 1960s.",
+    "justification": "Samuel Huntington's 'Political Order in Changing Societies' (1968) analyzed the challenges of modernization and social mobilization, highlighting political decay and stability issues."
+  },
+  {
+    "question_number": 28,
+    "question": "Which of the following is a key characteristic of a 'Federal System'?",
+    "options": ["Centralized authority", "Division of powers between levels of government", "Unitary legal system", "Single legislature"],
+    "answer": "Division of powers between levels of government",
+    "hint": "Think of dual sovereignty between national and regional units.",
+    "justification": "Federalism is defined by the constitutional division of powers between central and subnational governments, allowing shared governance and autonomy."
+  },
+  {
+    "question_number": 29,
+    "question": "The concept of 'Political Culture' was popularized by which group of scholars?",
+    "options": ["Almond and Verba", "Robert Dahl and Tocqueville", "Max Weber and Durkheim", "David Easton and Lipset"],
+    "answer": "Almond and Verba",
+    "hint": "Think of empirical studies comparing civic attitudes in nations.",
+    "justification": "Almond and Verba's 'The Civic Culture' (1963) empirically examined political culture, linking citizen orientations to stability and democratic performance."
+  },
+  {
+    "question_number": 30,
+    "question": "Who introduced the concept of 'Soft Power' in international relations?",
+    "options": ["Joseph Nye", "Hans Morgenthau", "Kenneth Waltz", "Alexander Wendt"],
+    "answer": "Joseph Nye",
+    "hint": "Think influence through attraction rather than coercion.",
+    "justification": "Joseph Nye coined 'Soft Power' to describe a nation's ability to shape others' preferences through culture, political values, and diplomacy."
+  },
+  {
+    "question_number": 31,
+    "question": "Which political thinker is associated with the idea of 'Civil Disobedience'?",
+    "options": ["Henry David Thoreau", "John Locke", "Thomas Hobbes", "Jean-Jacques Rousseau"],
+    "answer": "Henry David Thoreau",
+    "hint": "Think 19th-century American philosopher advocating moral resistance to unjust laws.",
+    "justification": "Thoreau's essay 'Civil Disobedience' (1849) advocated nonviolent resistance against unjust governmental policies, influencing global leaders like Gandhi and Martin Luther King Jr."
+  },
+  {
+    "question_number": 32,
+    "question": "The 'Endogenous Growth Theory' in political economy emphasizes:",
+    "options": ["Internal factors like technology and innovation driving growth", "Foreign investment", "Trade liberalization", "Population control measures"],
+    "answer": "Internal factors like technology and innovation driving growth",
+    "hint": "Focus on growth driven by domestic innovation rather than external influences.",
+    "justification": "Endogenous growth theory suggests that economic growth is primarily determined by factors within the economy, such as innovation, human capital, and knowledge spillovers."
+  },
+  {
+    "question_number": 33,
+    "question": "Which of the following is a main critique of 'Behaviouralism'?",
+    "options": ["Neglects values and normative questions", "Overemphasis on qualitative analysis", "Focus on historical evolution", "Reliance on philosophical speculation"],
+    "answer": "Neglects values and normative questions",
+    "hint": "Think of Post-behaviouralism reaction.",
+    "justification": "Behaviouralism's scientific and empirical focus often ignored the normative, ethical, and policy-relevant dimensions of politics, which prompted Post-behavioural critique."
+  },
+  {
+    "question_number": 34,
+    "question": "Who coined the term 'Clash of Civilizations'?",
+    "options": ["Samuel Huntington", "Francis Fukuyama", "Edward Said", "Bernard Lewis"],
+    "answer": "Samuel Huntington",
+    "hint": "Think post-Cold War global conflict prediction.",
+    "justification": "Samuel Huntington's 1993 article and subsequent book proposed that future conflicts would occur along cultural and civilizational lines rather than ideological or economic lines."
+  },
+  {
+    "question_number": 35,
+    "question": "The concept of 'State Autonomy' refers to:",
+    "options": ["State's ability to pursue goals independently of societal pressures", "Totalitarian governance", "Federal decentralization", "Democratic accountability mechanisms"],
+    "answer": "State's ability to pursue goals independently of societal pressures",
+    "hint": "Think Max Weber's emphasis on state power relative to social groups.",
+    "justification": "State autonomy indicates the capacity of the state to formulate and implement policies without undue influence from interest groups or social pressures."
+  },
+  {
+    "question_number": 36,
+    "question": "Which amendment in the Indian Constitution introduced the Panchayati Raj system?",
+    "options": ["73rd Amendment", "74th Amendment", "42nd Amendment", "44th Amendment"],
+    "answer": "73rd Amendment",
+    "hint": "Focus on rural local governance reforms.",
+    "justification": "The 73rd Amendment Act (1992) mandated the establishment of Panchayati Raj institutions for decentralized rural governance."
+  },
+  {
+    "question_number": 37,
+    "question": "Who is associated with the concept of 'Political Opportunity Structure'?",
+    "options": ["Peter Eisinger", "Talcott Parsons", "Anthony Downs", "Samuel Huntington"],
+    "answer": "Peter Eisinger",
+    "hint": "Focus on conditions facilitating social movements.",
+    "justification": "Political Opportunity Structure theory posits that the success of social movements depends on favorable political contexts, a concept elaborated by Peter Eisinger and later by scholars like Sidney Tarrow."
+  },
+  {
+    "question_number": 38,
+    "question": "The concept of 'Hegemony' in political theory is attributed to:",
+    "options": ["Antonio Gramsci", "Karl Marx", "Max Weber", "Michel Foucault"],
+    "answer": "Antonio Gramsci",
+    "hint": "Think domination through ideology and consent rather than coercion.",
+    "justification": "Gramsci described hegemony as the dominance of one social class over others, maintained through ideological consent and cultural leadership rather than force."
+  },
+  {
+    "question_number": 39,
+    "question": "Which one of the following is considered a primary objective of the 73rd Constitutional Amendment Act?",
+    "options": ["Decentralization in rural governance", "Judicial reforms", "Reservation of seats in Parliament", "Strengthening Urban Local Bodies"],
+    "answer": "Decentralization in rural governance",
+    "hint": "Focus on empowering village-level institutions.",
+    "justification": "The 73rd Amendment institutionalized Panchayati Raj institutions to enable decentralized decision-making and local governance in rural India."
+  },
+  {
+    "question_number": 40,
+    "question": "Who authored the book 'The Modern State' analyzing the evolution of state institutions?",
+    "options": ["Maurice Duverger", "Max Weber", "Ralf Dahrendorf", "Norberto Bobbio"],
+    "answer": "Maurice Duverger",
+    "hint": "Focus on comparative politics and modern institutional analysis.",
+    "justification": "Duverger's 'The Modern State' (1972) provides an analytical study of state development, institutional characteristics, and the evolution of governance structures."
+  },
+  {
+    "question_number": 41,
+    "question": "The 'Resource Curse' in political economy refers to:",
+    "options": ["Abundance of natural resources leading to poor economic and political outcomes", "Scarcity of resources", "Trade deficits", "Colonial exploitation"],
+    "answer": "Abundance of natural resources leading to poor economic and political outcomes",
+    "hint": "Think paradox where wealth becomes a liability.",
+    "justification": "The resource curse theory suggests that countries rich in natural resources may experience slower growth, corruption, and authoritarianism due to overdependence on resource rents."
+  },
+  {
+    "question_number": 42,
+    "question": "Which concept emphasizes the 'right to self-determination' of nations?",
+    "options": ["Sovereignty", "Nationalism", "Federalism", "Autonomy"],
+    "answer": "Nationalism",
+    "hint": "Focus on collective identity and political independence.",
+    "justification": "Nationalism asserts the right of peoples to govern themselves and pursue political and cultural self-determination."
+  },
+  {
+    "question_number": 43,
+    "question": "The 'World-Systems Theory' was developed by:",
+    "options": ["Immanuel Wallerstein", "Karl Marx", "Max Weber", "Dependency School theorists"],
+    "answer": "Immanuel Wallerstein",
+    "hint": "Think global economic hierarchies and core-periphery relations.",
+    "justification": "Wallerstein's World-Systems Theory (1974) explains global inequalities through a capitalist world economy divided into core, semi-periphery, and periphery states."
+  },
+  {
+    "question_number": 44,
+    "question": "Which thinker emphasized the concept of 'Procedural Democracy' over substantive outcomes?",
+    "options": ["Joseph Schumpeter", "Robert Dahl", "Alexis de Tocqueville", "John Stuart Mill"],
+    "answer": "Joseph Schumpeter",
+    "hint": "Focus on electoral processes and competition as the essence of democracy.",
+    "justification": "Schumpeter (1942) defined democracy as a competitive process in which leaders are chosen through elections, emphasizing procedure rather than social or economic outcomes."
+  },
+  {
+    "question_number": 45,
+    "question": "The concept of 'Democratic Peace Theory' suggests that:",
+    "options": ["Democratic nations rarely go to war with each other", "Democracy promotes internal peace", "Peace is a prerequisite for democracy", "All democracies are peaceful"],
+    "answer": "Democratic nations rarely go to war with each other",
+    "hint": "Think about international relations between democratic states.",
+    "justification": "Democratic Peace Theory posits that democratic countries are less likely to engage in armed conflict with other democracies due to shared norms and institutions."
+  },
+  {
+    "question_number": 46,
+    "question": "Who developed the concept of 'Rational Choice Theory' in political science?",
+    "options": ["Anthony Downs", "Kenneth Arrow", "Mancur Olson", "James Buchanan"],
+    "answer": "Anthony Downs",
+    "hint": "Think of 'An Economic Theory of Democracy'.",
+    "justification": "Anthony Downs' 'An Economic Theory of Democracy' (1957) applied economic reasoning to political behavior, pioneering rational choice theory in political science."
+  },
+
+];
+
+// Dynamically display quiz
+const quizContainer = document.getElementById('quiz');
+quizData.forEach((item, index) => {
+    const questionDiv = document.createElement('div');
+    questionDiv.classList.add('question');
+    questionDiv.innerHTML = `<p>${item.question}</p>`;
+    
+    const optionsDiv = document.createElement('div');
+    optionsDiv.classList.add('options');
+    
+    item.options.forEach(option => {
+        const optionHTML = `<label><input type="radio" name="q${index}" value="${option}"> ${option}</label>`;
+        optionsDiv.innerHTML += optionHTML;
+    });
+    
+    quizContainer.appendChild(questionDiv);
+    quizContainer.appendChild(optionsDiv);
+});
+
+const submitBtn = document.getElementById('submitBtn');
+const reportBtn = document.getElementById('reportBtn');
+let userAnswers = [];
+
+// Submit button logic
+submitBtn.onclick = function() {
+    userAnswers = [];
+    let score = 0;
+    quizData.forEach((item, index) => {
+        const selected = document.querySelector(`input[name="q${index}"]:checked`);
+        userAnswers[index] = selected ? selected.value : null;
+        if (selected && selected.value === item.answer) {
+            score++;
+        }
+        // Disable all radio buttons after submission
+        document.querySelectorAll(`input[name="q${index}"]`).forEach(input => input.disabled = true);
+    });
+    document.getElementById('result').textContent = `Your score: ${score} / ${quizData.length}`;
+    submitBtn.style.display = 'none';
+    reportBtn.style.display = 'inline-block';
+};
+
+// Detailed report logic
+reportBtn.onclick = function() {
+    let reportHtml = '';
+    quizData.forEach((item, index) => {
+        reportHtml += `<div class="question">
+            <strong>Q${index + 1}:</strong> ${item.question}
+            <span>Your answer: ${userAnswers[index] !== null ? userAnswers[index] : '<em>Not answered</em>'}</span>
+            <span>Correct answer: ${item.answer}</span>
+            <span style="color:${userAnswers[index] === item.answer ? 'green' : 'red'};">
+                ${userAnswers[index] === item.answer ? "Correct" : "Incorrect"}
+            </span>
+        </div><hr>`;
+    });
+    document.getElementById('detailedReport').innerHTML = reportHtml;
+    reportBtn.disabled = true; // Disable after once viewed (optional)
+};
+
+</script>
+</body>
+</html>
