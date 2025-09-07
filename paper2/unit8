@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Public Administration - Advanced Quiz</title>
+<style>
+  body { font-family: Arial, sans-serif; background: #f4f6fb; margin:0; padding:0; }
+  header { background: #1a237e; color:#fff; padding:15px; text-align:center; }
+  .container { max-width: 900px; margin: 20px auto; background:#fff; border-radius:10px;
+    box-shadow:0 2px 6px rgba(0,0,0,0.1); padding:20px; position:relative; }
+  .timer { position:fixed; top:15px; right:15px; background:#1a237e; color:#fff;
+    padding:10px 15px; border-radius:6px; font-weight:bold; z-index:1000; }
+  .timer.warning { background:#e53935; }
+  .question-card { padding:20px; border-radius:8px; background:#f9f9f9; margin-bottom:20px;
+    transition: all 0.3s ease; }
+  .options label { display:block; margin:6px 0; padding:8px; border:1px solid #ddd; border-radius:6px;
+    cursor:pointer; transition: background 0.3s; }
+  .options input { margin-right:10px; }
+  .options label:hover { background:#f1f1f1; }
+  .nav-panel { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:20px; justify-content:center; }
+  .nav-panel button { padding:8px 12px; border:none; border-radius:6px; cursor:pointer; }
+  .nav-panel button.unanswered { background:#e0e0e0; }
+  .nav-panel button.answered { background:#1a237e; color:#fff; }
+  .nav-panel button.flagged { background:#ff9800; color:#fff; }
+  .nav-panel button.current { border:2px solid #ffeb3b; }
+  .actions { display:flex; justify-content:space-between; margin-top:15px; flex-wrap:wrap; gap:10px; }
+  button.action { background:#1a237e; color:#fff; border:none; padding:10px 20px; border-radius:6px; cursor:pointer; }
+  button.action:hover { background:#3949ab; }
+  button.flag-action { background:#ff9800; color:#fff; }
+  button.flag-action:hover { background:#e68900; }
+  .progress-container { width:100%; background:#ddd; border-radius:8px; margin-bottom:15px; }
+  .progress-bar { height:10px; background:#1a237e; width:0%; border-radius:8px; transition: width 0.3s; }
+  .result { margin-top:20px; font-weight:bold; color:#1a237e; }
+</style>
+</head>
+<body>
+
+<header>
+<h1>Public Administration - Advanced Quiz</h1>
+<p>Answer all questions. Timer is running!</p>
+</header>
+
+<div class="timer" id="timer">Time Left: 10:00</div>
+
+<div class="container">
+<div class="progress-container"><div class="progress-bar" id="progressBar"></div></div>
+<div class="nav-panel" id="navPanel"></div>
+<div id="questionContainer"></div>
+
+<div class="actions">
+<button class="action" id="prevBtn">Previous</button>
+<button class="action" id="nextBtn">Next</button>
+<button class="flag-action" id="flagBtn">Flag / Unflag</button>
+<button class="action" id="submitBtn" style="display:none;">Submit Quiz</button>
+</div>
+
+<div class="result" id="result"></div>
+</div>
+
+<script>
+// -------- Question Pool --------
+const questions=[
+{q:"Who is considered the father of Public Administration?",options:["Woodrow Wilson","Max Weber","Frederick Taylor","Henri Fayol"],answer:0},
+{q:"The concept of bureaucracy was developed by:",options:["Karl Marx","Max Weber","Herbert Simon","Mary Parker Follett"],answer:1},
+{q:"POSDCORB was given by:",options:["Luther Gulick","Chester Barnard","Elton Mayo","Herbert Simon"],answer:0},
+{q:"Which of the following is NOT a principle of scientific management?",options:["Time Study","Unity of Command","Functional Foremanship","Standardization"],answer:1},
+{q:"The Hawthorne Studies are associated with:",options:["Human Relations Theory","Bureaucratic Theory","Classical Theory","Decision-Making Theory"],answer:0},
+{q:"Who wrote 'The Functions of the Executive'?",options:["Chester Barnard","Herbert Simon","Luther Gulick","Mary Parker Follett"],answer:0},
+{q:"Span of control refers to:",options:["Number of subordinates a manager can supervise","Length of control period","Area of control","None of the above"],answer:0},
+{q:"The principle of 'Unity of Command' means:",options:["One subordinate, one boss","Many bosses","No boss","None of the above"],answer:0},
+{q:"Who introduced the concept of 'Administrative Man'?",options:["Herbert Simon","Max Weber","Woodrow Wilson","Elton Mayo"],answer:0},
+{q:"Which of the following is a feature of bureaucracy?",options:["Hierarchy","Informality","Personalized Authority","Lack of Rules"],answer:0},
+{q:"Who propounded the 'Decision-Making Theory' in Public Administration?",options:["Herbert Simon","Max Weber","Luther Gulick","Chester Barnard"],answer:0},
+{q:"The term 'New Public Management' was first used in which country?",options:["United Kingdom","United States","Australia","Canada"],answer:0},
+{q:"Which of the following is NOT a characteristic of Weberian bureaucracy?",options:["Impersonality","Hierarchy","Patrimonialism","Rules"],answer:2},
+{q:"Who is associated with the concept of 'Zone of Indifference'?",options:["Chester Barnard","Herbert Simon","Elton Mayo","Luther Gulick"],answer:0},
+{q:"The 'Iron Law of Oligarchy' was given by:",options:["Robert Michels","Max Weber","Karl Marx","Frederick Taylor"],answer:0},
+{q:"Which committee recommended the creation of the Central Vigilance Commission in India?",options:["Santhanam Committee","Kothari Committee","Gadgil Committee","Ashok Mehta Committee"],answer:0},
+{q:"The term 'Development Administration' was popularized by:",options:["F.W. Riggs","Dwight Waldo","Max Weber","Herbert Simon"],answer:0},
+{q:"The concept of 'Ecology of Administration' was given by:",options:["F.W. Riggs","Herbert Simon","Luther Gulick","Chester Barnard"],answer:0},
+{q:"Which of the following is NOT a function of the UPSC?",options:["Recruitment","Promotion","Disciplinary Control","Training"],answer:3},
+{q:"The 'Minnowbrook Conference' is associated with:",options:["New Public Administration","Classical Theory","Bureaucratic Theory","Scientific Management"],answer:0},
+{q:"Who is the author of 'Administrative Behavior'?",options:["Herbert Simon","Chester Barnard","Luther Gulick","Max Weber"],answer:0},
+{q:"Which of the following is NOT a feature of New Public Management?",options:["Decentralization","Customer Orientation","Rigid Hierarchy","Performance Measurement"],answer:2},
+{q:"The term 'Good Governance' was first used by:",options:["World Bank","UNDP","IMF","OECD"],answer:0},
+{q:"Which article of the Indian Constitution deals with the Public Service Commissions?",options:["Article 315","Article 320","Article 324","Article 312"],answer:0},
+{q:"The 'Peter Principle' states that:",options:["Employees rise to their level of incompetence","Employees are always competent","Employees never get promoted","None of the above"],answer:0},
+{q:"Who is associated with the 'Prismatic Society' model?",options:["F.W. Riggs","Herbert Simon","Max Weber","Elton Mayo"],answer:0},
+{q:"Which of the following is NOT a type of authority according to Max Weber?",options:["Traditional","Charismatic","Legal-Rational","Democratic"],answer:3},
+{q:"The concept of 'Span of Control' was developed by:",options:["V.A. Graicunas","Luther Gulick","Henri Fayol","Chester Barnard"],answer:0},
+{q:"Which of the following is NOT a principle of Henri Fayol?",options:["Scalar Chain","Division of Work","Unity of Direction","Functional Foremanship"],answer:3},
+{q:"Who wrote 'Administrative Thinkers'?",options:["Prasad and Prasad","Dwight Waldo","Peter Drucker","Paul Appleby"],answer:0},
+{q:"The 'Gulick and Urwick' report is related to:",options:["Reorganization of British Civil Services","Reorganization of Indian Civil Services","Reorganization of American Civil Services","None of the above"],answer:0},
+{q:"Which of the following is NOT a function of management?",options:["Planning","Organizing","Commanding","Complaining"],answer:3},
+{q:"The term 'POSDCORB' stands for:",options:["Planning, Organizing, Staffing, Directing, Coordinating, Reporting, Budgeting","Planning, Organizing, Staffing, Directing, Controlling, Reporting, Budgeting","Planning, Organizing, Supervising, Directing, Coordinating, Reporting, Budgeting","Planning, Operating, Staffing, Directing, Coordinating, Reporting, Budgeting"],answer:0},
+{q:"Who is known for the '14 Principles of Management'?",options:["Henri Fayol","Frederick Taylor","Max Weber","Luther Gulick"],answer:0},
+{q:"The concept of 'Unity of Command' was given by:",options:["Henri Fayol","Frederick Taylor","Max Weber","Luther Gulick"],answer:0},
+{q:"Which of the following is NOT a type of budget?",options:["Performance Budget","Zero-Based Budget","Line-Item Budget","Incremental Budget"],answer:3},
+{q:"The 'Appleby Report' is related to:",options:["Public Administration in India","Public Administration in USA","Public Administration in UK","Public Administration in Canada"],answer:0},
+{q:"Who is associated with the 'Human Relations Movement'?",options:["Elton Mayo","Frederick Taylor","Max Weber","Henri Fayol"],answer:0},
+{q:"The 'Hawthorne Experiments' were conducted at:",options:["Western Electric Company","General Electric Company","Ford Motors","Siemens"],answer:0},
+{q:"Which of the following is NOT a feature of bureaucracy?",options:["Hierarchy","Rules","Personalized Authority","Impersonality"],answer:2},
+{q:"The 'Simon Model' is related to:",options:["Decision-Making","Leadership","Motivation","Communication"],answer:0},
+{q:"Who is the author of 'The Study of Administration'?",options:["Woodrow Wilson","Max Weber","Frederick Taylor","Henri Fayol"],answer:0},
+{q:"The '14th Finance Commission' was headed by:",options:["Y.V. Reddy","Vijay Kelkar","C. Rangarajan","N.K. Singh"],answer:0},
+{q:"Which of the following is NOT a function of the Cabinet Secretariat in India?",options:["Policy Coordination","Secretarial Assistance","Implementation of Policies","Judicial Review"],answer:3},
+{q:"The 'Kothari Commission' is related to:",options:["Education","Health","Agriculture","Finance"],answer:0},
+{q:"Who is associated with the concept of 'Informal Organization'?",options:["Chester Barnard","Herbert Simon","Luther Gulick","Max Weber"],answer:0},
+{q:"The 'Right to Information Act' was enacted in:",options:["2005","2002","2008","2010"],answer:0},
+{q:"Which of the following is NOT a type of audit?",options:["Performance Audit","Financial Audit","Social Audit","Judicial Audit"],answer:3},
+{q:"The 'Santhanam Committee' is related to:",options:["Prevention of Corruption","Education Reforms","Administrative Reforms","Electoral Reforms"],answer:0},
+{q:"Who is the author of 'Politics and Administration'?",options:["Frank J. Goodnow","Woodrow Wilson","Max Weber","Herbert Simon"],answer:0},
+{q:"The 'First Administrative Reforms Commission' was set up in:",options:["1966","1976","1986","1996"],answer:0},
+{q:"Which of the following is NOT a feature of Development Administration?",options:["Goal Orientation","Change Orientation","Status Quo Orientation","Client Orientation"],answer:2},
+{q:"The 'Riggsian Model' is associated with:",options:["Comparative Public Administration","Classical Theory","Bureaucratic Theory","Human Relations Theory"],answer:0},
+{q:"Who is associated with the concept of 'Leadership Continuum'?",options:["Tannenbaum and Schmidt","Herbert Simon","Chester Barnard","Elton Mayo"],answer:0},
+{q:"The 'Second ARC' submitted its first report in:",options:["2006","2008","2010","2012"],answer:0},
+{q:"Which of the following is NOT a principle of organization?",options:["Hierarchy","Unity of Command","Delegation","Centralization"],answer:3},
+{q:"The 'Whitley Councils' are related to:",options:["Employer-Employee Relations","Budgeting","Planning","Auditing"],answer:0},
+{q:"Who is the author of 'The Ecology of Public Administration'?",options:["F.W. Riggs","Herbert Simon","Luther Gulick","Chester Barnard"],answer:0},
+{q:"The 'O&M' stands for:",options:["Organization and Methods","Organization and Management","Operations and Management","Operations and Methods"],answer:0},
+{q:"Which of the following is NOT a type of decentralization?",options:["Deconcentration","Delegation","Devolution","Centralization"],answer:3},
+{q:"The 'Zero-Based Budgeting' was first introduced in India in:",options:["1987","1991","2000","1978"],answer:0},
+{q:"Who is associated with the concept of 'Satisfying' in decision-making?",options:["Herbert Simon","Max Weber","Chester Barnard","Elton Mayo"],answer:0},
+{q:"The 'Performance Budgeting' was first introduced in India in:",options:["1954","1969","1975","1980"],answer:0},
+{q:"Which of the following is NOT a function of the District Collector?",options:["Revenue Collection","Law and Order","Judicial Functions","Legislative Functions"],answer:3},
+{q:"The 'All India Services' are created under which article of the Constitution?",options:["Article 312","Article 320","Article 315","Article 324"],answer:0},
+{q:"Who is the author of 'Public Administration: Concepts and Theories'?",options:["Rumki Basu","Prasad and Prasad","Dwight Waldo","Paul Appleby"],answer:0},
+{q:"The 'Central Vigilance Commission' was set up in:",options:["1964","1974","1984","1994"],answer:0},
+{q:"Which of the following is NOT a function of the Finance Commission?",options:["Distribution of Taxes","Grants-in-Aid","Audit of Accounts","Recommendations on Fiscal Matters"],answer:2},
+{q:"The 'Code of Conduct for Civil Servants' was recommended by:",options:["Santhanam Committee","Kothari Committee","Gadgil Committee","Ashok Mehta Committee"],answer:0},
+{q:"Who is associated with the concept of 'Administrative Dichotomy'?",options:["Woodrow Wilson","Max Weber","Herbert Simon","Elton Mayo"],answer:0},
+{q:"The 'Public Accounts Committee' examines:",options:["Audit Reports","Budget Estimates","Finance Bills","Appropriation Bills"],answer:0},
+{q:"Which of the following is NOT a function of the Planning Commission?",options:["Formulation of Five-Year Plans","Allocation of Resources","Implementation of Plans","Audit of Plans"],answer:3},
+{q:"The 'Estimates Committee' consists of how many members?",options:["30","15","22","25"],answer:0},
+{q:"Who is the author of 'The Human Side of Enterprise'?",options:["Douglas McGregor","Elton Mayo","Herbert Simon","Chester Barnard"],answer:0},
+{q:"The 'Lokpal and Lokayuktas Act' was enacted in:",options:["2013","2010","2015","2017"],answer:0},
+{q:"Which of the following is NOT a feature of e-Governance?",options:["Transparency","Accountability","Red Tapism","Efficiency"],answer:2},
+{q:"The 'Right to Public Services Act' was first enacted by which state?",options:["Madhya Pradesh","Bihar","Rajasthan","Karnataka"],answer:0},
+{q:"Who is associated with the concept of 'Public Choice Theory'?",options:["Vincent Ostrom","Herbert Simon","Max Weber","Elton Mayo"],answer:0},
+{q:"The 'Citizen's Charter' was first introduced in which country?",options:["United Kingdom","United States","India","Australia"],answer:0},
+{q:"Which of the following is NOT a function of the Comptroller and Auditor General of India?",options:["Audit of Accounts","Audit of Receipts and Expenditure","Policy Formulation","Audit of Government Companies"],answer:2},
+{q:"The 'NITI Aayog' replaced which institution?",options:["Planning Commission","Finance Commission","Election Commission","UPSC"],answer:0},
+{q:"Who is the author of 'The Administrative State'?",options:["Dwight Waldo","Herbert Simon","Chester Barnard","Max Weber"],answer:0},
+{q:"The 'Sevottam Model' is related to:",options:["Service Delivery","Budgeting","Planning","Auditing"],answer:0},
+{q:"Which of the following is NOT a type of motivation?",options:["Intrinsic","Extrinsic","Coercive","Normative"],answer:2},
+{q:"The 'Social Audit' is primarily used in which scheme?",options:["MGNREGA","PMGSY","NRHM","SSA"],answer:0},
+{q:"Who is associated with the concept of 'Street-Level Bureaucracy'?",options:["Michael Lipsky","Herbert Simon","Max Weber","Elton Mayo"],answer:0},
+{q:"The 'Right to Information Act' is based on which principle?",options:["Transparency","Secrecy","Hierarchy","Centralization"],answer:0},
+{q:"Which of the following is NOT a function of the State Public Service Commission?",options:["Recruitment","Promotion","Disciplinary Control","Legislation"],answer:3},
+{q:"The 'Central Administrative Tribunal' was established in:",options:["1985","1990","1995","2000"],answer:0},
+{q:"Who is the author of 'Public Administration in Theory and Practice'?",options:["M.P. Sharma","Dwight Waldo","Paul Appleby","Rumki Basu"],answer:0},
+{q:"The 'Good Governance Index' is released by:",options:["Government of India","World Bank","UNDP","OECD"],answer:0},
+{q:"Which of the following is NOT a principle of delegation?",options:["Unity of Command","Parity of Authority and Responsibility","Absoluteness of Responsibility","Centralization"],answer:3},
+{q:"The 'Right to Service Act' aims at:",options:["Timely Delivery of Services","Revenue Collection","Law and Order","Judicial Functions"],answer:0},
+{q:"Who is associated with the concept of 'Administrative Culture'?",options:["Dwight Waldo","Herbert Simon","Max Weber","Elton Mayo"],answer:0},
+{q:"The 'Citizen's Charter' aims at:",options:["Improving Service Delivery","Increasing Revenue","Reducing Expenditure","Enhancing Secrecy"],answer:0},
+{q:"Which of the following is NOT a function of the Cabinet Secretariat?",options:["Policy Coordination","Secretarial Assistance","Implementation of Policies","Judicial Review"],answer:3},
+{q:"The 'Right to Information Act' covers:",options:["All Public Authorities","Private Companies","NGOs","Political Parties"],answer:0},
+{q:"Who is the author of 'Public Administration: A Comparative Perspective'?",options:["Ferrel Heady","Dwight Waldo","Paul Appleby","Rumki Basu"],answer:0},
+{q:"The 'Central Vigilance Commission' is:",options:["Statutory Body","Constitutional Body","Advisory Body","Judicial Body"],answer:0},
+{q:"Which of the following is NOT a feature of bureaucracy?",options:["Hierarchy","Rules","Personalized Authority","Impersonality"],answer:2},
+{q:"The 'Second Administrative Reforms Commission' was headed by:",options:["Veerappa Moily","M. Veerappa Moily","N.K. Singh","Y.V. Reddy"],answer:0},
+{q:"Who is associated with the concept of 'Public Interest Theory'?",options:["A.C. Pigou","Herbert Simon","Max Weber","Elton Mayo"],answer:0},
+{q:"The 'Right to Information Act' was enacted in:",options:["2005","2002","2008","2010"],answer:0},
+{q:"Which of the following is NOT a function of the District Collector?",options:["Revenue Collection","Law and Order","Judicial Functions","Legislative Functions"],answer:3},
+{q:"The 'All India Services' are created under which article of the Constitution?",options:["Article 312","Article 320","Article 315","Article 324"],answer:0},
+{q:"Who is the author of 'Public Administration: Concepts and Theories'?",options:["Rumki Basu","Prasad and Prasad","Dwight Waldo","Paul Appleby"],answer:0},
+{q:"The 'Central Vigilance Commission' was set up in:",options:["1964","1974","1984","1994"],answer:0},
+{q:"Which of the following is NOT a function of the Finance Commission?",options:["Distribution of Taxes","Grants-in-Aid","Audit of Accounts","Recommendations on Fiscal Matters"],answer:2},
+{q:"The 'Code of Conduct for Civil Servants' was recommended by:",options:["Santhanam Committee","Kothari Committee","Gadgil Committee","Ashok Mehta Committee"],answer:0},
+{q:"Who is associated with the concept of 'Administrative Dichotomy'?",options:["Woodrow Wilson","Max Weber","Herbert Simon","Elton Mayo"],answer:0},
+{q:"The 'Public Accounts Committee' examines:",options:["Audit Reports","Budget Estimates","Finance Bills","Appropriation Bills"],answer:0},
+{q:"Which of the following is NOT a function of the Planning Commission?",options:["Formulation of Five-Year Plans","Allocation of Resources","Implementation of Plans","Audit of Plans"],answer:3},
+{q:"The 'Estimates Committee' consists of how many members?",options:["30","15","22","25"],answer:0},
+{q:"Who is the author of 'The Human Side of Enterprise'?",options:["Douglas McGregor","Elton Mayo","Herbert Simon","Chester Barnard"],answer:0},
+{q:"The 'Lokpal and Lokayuktas Act' was enacted in:",options:["2013","2010","2015","2017"],answer:0},
+{q:"Which of the following is NOT a feature of e-Governance?",options:["Transparency","Accountability","Red Tapism","Efficiency"],answer:2},
+{q:"The 'Right to Public Services Act' was first enacted by which state?",options:["Madhya Pradesh","Bihar","Rajasthan","Karnataka"],answer:0},
+{q:"Who is associated with the concept of 'Public Choice Theory'?",options:["Vincent Ostrom","Herbert Simon","Max Weber","Elton Mayo"],answer:0},
+{q:"The 'Citizen's Charter' was first introduced in which country?",options:["United Kingdom","United States","India","Australia"],answer:0},
+{q:"Which of the following is NOT a function of the Comptroller and Auditor General of India?",options:["Audit of Accounts","Audit of Receipts and Expenditure","Policy Formulation","Audit of Government Companies"],answer:2},
+{q:"The 'NITI Aayog' replaced which institution?",options:["Planning Commission","Finance Commission","Election Commission","UPSC"],answer:0},
+{q:"Who is the author of 'The Administrative State'?",options:["Dwight Waldo","Herbert Simon","Chester Barnard","Max Weber"],answer:0},
+{q:"The 'Sevottam Model' is related to:",options:["Service Delivery","Budgeting","Planning","Auditing"],answer:0},
+{q:"Which of the following is NOT a type of motivation?",options:["Intrinsic","Extrinsic","Coercive","Normative"],answer:2},
+{q:"The 'Social Audit' is primarily used in which scheme?",options:["MGNREGA","PMGSY","NRHM","SSA"],answer:0},
+{q:"Who is associated with the concept of 'Street-Level Bureaucracy'?",options:["Michael Lipsky","Herbert Simon","Max Weber","Elton Mayo"],answer:0},
+{q:"The 'Right to Information Act' is based on which principle?",options:["Transparency","Secrecy","Hierarchy","Centralization"],answer:0}
+];
+
+// -------- Variables --------
+let current=0;
+const userAnswers=Array(questions.length).fill(null);
+const flagged=Array(questions.length).fill(false);
+
+const questionContainer=document.getElementById('questionContainer');
+const navPanel=document.getElementById('navPanel');
+const prevBtn=document.getElementById('prevBtn');
+const nextBtn=document.getElementById('nextBtn');
+const submitBtn=document.getElementById('submitBtn');
+const flagBtn=document.getElementById('flagBtn');
+const resultDiv=document.getElementById('result');
+const progressBar=document.getElementById('progressBar');
+
+// -------- Timer --------
+let timeLeft=10*60;
+const timerEl=document.getElementById('timer');
+const timerInterval=setInterval(()=>{
+  let m=Math.floor(timeLeft/60),s=timeLeft%60;
+  timerEl.textContent=`Time Left: ${m}:${s<10?'0':''}${s}`;
+  if(timeLeft<=60) timerEl.classList.add('warning');
+  timeLeft--;
+  if(timeLeft<0){clearInterval(timerInterval);submitQuiz();}
+},1000);
+
+// -------- Functions --------
+function renderNav(){
+  navPanel.innerHTML='';
+  questions.forEach((q,i)=>{
+    const btn=document.createElement('button');
+    btn.textContent=i+1;
+    btn.className= flagged[i] ? 'flagged' : (userAnswers[i]!==null?'answered':'unanswered');
+    if(i===current) btn.classList.add('current');
+    btn.onclick=()=>{current=i; renderQuestion();};
+    navPanel.appendChild(btn);
+  });
+  progressBar.style.width=`${(userAnswers.filter(a=>a!==null).length/questions.length)*100}%`;
+}
+
+function renderQuestion(){
+  const q=questions[current];
+  questionContainer.innerHTML=`<div class="question-card">${current+1}. ${q.q}<div class="options"></div></div>`;
+  const optionsDiv=questionContainer.querySelector('.options');
+  q.options.forEach((opt,j)=>{
+    optionsDiv.innerHTML+=`<label><input type="radio" name="q" value="${j}" ${userAnswers[current]===j?'checked':''}> ${opt}</label>`;
+  });
+  document.querySelectorAll('input[name="q"]').forEach(el=>{
+    el.onchange=()=>{userAnswers[current]=parseInt(el.value); renderNav();}
+  });
+  prevBtn.style.display=current===0?'none':'inline-block';
+  nextBtn.style.display=current===questions.length-1?'none':'inline-block';
+  submitBtn.style.display=current===questions.length-1?'inline-block':'none';
+  flagBtn.textContent=flagged[current]?'Unflag':'Flag / Unflag';
+  renderNav();
+}
+
+// -------- Button Actions --------
+prevBtn.onclick=()=>{current--; renderQuestion();}
+nextBtn.onclick=()=>{current++; renderQuestion();}
+flagBtn.onclick=()=>{flagged[current]=!flagged[current]; renderQuestion();}
+submitBtn.onclick=()=>submitQuiz();
+
+// -------- Submit Quiz --------
+function submitQuiz(){
+  clearInterval(timerInterval);
+  let score=0,report='';
+  questions.forEach((q,i)=>{
+    const user=userAnswers[i];
+    if(user===q.answer){score++; report+=`${i+1}. Correct${flagged[i]?' [Flagged]':''}<br>`;}
+    else{report+=`${i+1}. Incorrect (Correct: ${q.options[q.answer]})${flagged[i]?' [Flagged]':''}<br>`;}
+  });
+  questionContainer.innerHTML='';
+  navPanel.innerHTML='';
+  prevBtn.style.display='none';
+  nextBtn.style.display='none';
+  submitBtn.style.display='none';
+  flagBtn.style.display='none';
+  progressBar.style.width='100%';
+  resultDiv.innerHTML=`<h3>Your Score: ${score} / ${questions.length}</h3><br>${report}`;
+}
+
+// -------- Initial Render --------
+renderQuestion();
+</script>
+
+</body>
+</html>
