@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NTA-UGC NET Political Science Quiz 2024</title>
+<style>
+    body { font-family: Arial, sans-serif; background: #f4f4f9; margin: 0; padding: 20px; }
+    h1 { text-align: center; color: #333; }
+    .quiz-container { max-width: 900px; margin: 20px auto; background: #fff; padding: 25px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+    .question { margin: 20px 0; font-weight: bold; }
+    .options label { display: block; margin: 8px 0; cursor: pointer; }
+    button { margin-top: 20px; padding: 10px 20px; background: #007bff; border: none; color: #fff; font-size: 16px; border-radius: 5px; cursor: pointer; }
+    button:hover { background: #0056b3; }
+    .result { margin-top: 20px; padding: 15px; background: #e2e2f0; border-radius: 8px; font-weight: bold; }
+    .report { margin-top: 20px; padding: 15px; border-radius: 8px; background: #f1f1f1; }
+    .correct-answer { color: green; font-weight: bold; }
+    .wrong-answer { color: red; font-weight: bold; }
+</style>
+</head>
+<body>
+
+<h1>NTA-UGC NET Political Science Quiz 2024</h1>
+<div class="quiz-container" id="quiz"></div>
+<button onclick="submitQuiz()">Submit Quiz</button>
+<div class="result" id="result"></div>
+<div class="report" id="report"></div>
+
+<script>
+const quizData = [
+    { question: "51. Who was the President of the World’s Religions at Chicago in which Swami Vivekananda delivered his famous address?", options: ["Woodrow Wilson","Paul Deusen","John Henry Barrows","Leo Tolstoy"], answer: ["John Henry Barrows"], type: "single" },
+    { question: "52. Under which Prime Minister, the 73 and 74 Constitution amendment act was passed?", options: ["V. P. Singh","Morarji Desai","Atal Bihari Vajpayee","P. V. Narasimha Rao"], answer: ["P. V. Narasimha Rao"], type: "single" },
+    { question: "53. Find out the correct statements: A. NITI Aayog like Planning Commission was also created by an executive resolution. B. The Consumer Protection Act, 2023 has repealed and replaced the earlier Consumer Protection act, 1986. C. The earliest democratic institution for citizen grievance is Russian Ombudsman. D. The first ARC of India recommended Lokpal and Lokayukta. E. The first ARC of India was headed by Moraji Desai.", options: ["A, B, C, E Only","A, C, D, E only","A, D, E only","B, C, D, E only"], answer: ["A, D, E only"], type: "single" },
+    { question: "54. Identify the correct statements: A. Eighth SAARC Summit held at New Delhi in 1995. B. 1989 was designated as SAARC year of combating drug abuse. C. Assassination attempt on US President Barack Obama. D. Bilawal Bhutto Zardari became PM of Pakistan in 2024. E. Agreement on SAARC preferential trading arrangement signed 11 April, 1993.", options: ["A, B, C, only","B, C, D, only","C and D only","A, B, E only"], answer: ["A, B, E only"], type: "single" },
+    { question: "55. Consider Article 15 of the Constitution of India. The state shall not discriminate against any citizen on grounds of: A. Religion B. Race C. Caste D. Sex E. Place of birth", options: ["B, C only","A, C, D, only","B, D only","A, B, C, D, E"], answer: ["A, B, C, D, E"], type: "single" }
+];
+
+// Display quiz
+const quizContainer = document.getElementById('quiz');
+quizData.forEach((item, index) => {
+    const questionDiv = document.createElement('div');
+    questionDiv.classList.add('question');
+    questionDiv.innerHTML = `<p>${item.question}</p>`;
+    
+    const optionsDiv = document.createElement('div');
+    optionsDiv.classList.add('options');
+    
+    item.options.forEach(option => {
+        const inputType = item.type === "single" ? "radio" : "checkbox";
+        optionsDiv.innerHTML += `<label><input type="${inputType}" name="q${index}" value="${option}"> ${option}</label>`;
+    });
+    
+    quizContainer.appendChild(questionDiv);
+    quizContainer.appendChild(optionsDiv);
+});
+
+function submitQuiz() {
+    let score = 0;
+    let reportHTML = '';
+    
+    quizData.forEach((item, index) => {
+        const selectedElements = document.querySelectorAll(`input[name="q${index}"]:checked`);
+        const selectedValues = Array.from(selectedElements).map(el => el.value);
+
+        const correct = JSON.stringify(selectedValues) === JSON.stringify(item.answer);
+        if(correct) score++;
+
+        // Build detailed report
+        reportHTML += `<p><strong>Q${index+1}:</strong> ${item.question}<br>`;
+        reportHTML += `Your Answer: <span class="${correct ? 'correct-answer' : 'wrong-answer'}">${selectedValues.length ? selectedValues.join(', ') : 'Not Answered'}</span><br>`;
+        reportHTML += `Correct Answer: <span class="correct-answer">${item.answer.join(', ')}</span></p><hr>`;
+    });
+
+    document.getElementById('result').textContent = `Your Score: ${score} / ${quizData.length}`;
+    document.getElementById('report').innerHTML = reportHTML;
+
+    // Scroll to report
+    document.getElementById('report').scrollIntoView({behavior: "smooth"});
+}
+</script>
+
+</body>
+</html>
