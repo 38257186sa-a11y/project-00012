@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Public Administration - Advanced Quiz</title>
+<style>
+  body { font-family: Arial, sans-serif; background: #f4f6fb; margin:0; padding:0; }
+  header { background: #1a237e; color:#fff; padding:15px; text-align:center; }
+  .container { max-width: 900px; margin: 20px auto; background:#fff; border-radius:10px;
+    box-shadow:0 2px 6px rgba(0,0,0,0.1); padding:20px; position:relative; }
+  .timer { position:fixed; top:15px; right:15px; background:#1a237e; color:#fff;
+    padding:10px 15px; border-radius:6px; font-weight:bold; z-index:1000; }
+  .timer.warning { background:#e53935; }
+  .question-card { padding:20px; border-radius:8px; background:#f9f9f9; margin-bottom:20px;
+    transition: all 0.3s ease; }
+  .options label { display:block; margin:6px 0; padding:8px; border:1px solid #ddd; border-radius:6px;
+    cursor:pointer; transition: background 0.3s; }
+  .options input { margin-right:10px; }
+  .options label:hover { background:#f1f1f1; }
+  .nav-panel { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:20px; justify-content:center; }
+  .nav-panel button { padding:8px 12px; border:none; border-radius:6px; cursor:pointer; }
+  .nav-panel button.unanswered { background:#e0e0e0; }
+  .nav-panel button.answered { background:#1a237e; color:#fff; }
+  .nav-panel button.flagged { background:#ff9800; color:#fff; }
+  .nav-panel button.current { border:2px solid #ffeb3b; }
+  .actions { display:flex; justify-content:space-between; margin-top:15px; flex-wrap:wrap; gap:10px; }
+  button.action { background:#1a237e; color:#fff; border:none; padding:10px 20px; border-radius:6px; cursor:pointer; }
+  button.action:hover { background:#3949ab; }
+  button.flag-action { background:#ff9800; color:#fff; }
+  button.flag-action:hover { background:#e68900; }
+  .progress-container { width:100%; background:#ddd; border-radius:8px; margin-bottom:15px; }
+  .progress-bar { height:10px; background:#1a237e; width:0%; border-radius:8px; transition: width 0.3s; }
+  .result { margin-top:20px; font-weight:bold; color:#1a237e; }
+</style>
+</head>
+<body>
+
+<header>
+<h1>international relation</h1>
+<p>Answer all questions. Timer is running!</p>
+</header>
+
+<div class="timer" id="timer">Time Left: 50:00</div>
+
+<div class="container">
+<div class="progress-container"><div class="progress-bar" id="progressBar"></div></div>
+<div class="nav-panel" id="navPanel"></div>
+<div id="questionContainer"></div>
+
+<div class="actions">
+<button class="action" id="prevBtn">Previous</button>
+<button class="action" id="nextBtn">Next</button>
+<button class="flag-action" id="flagBtn">Flag / Unflag</button>
+<button class="action" id="submitBtn" style="display:none;">Submit Quiz</button>
+</div>
+
+<div class="result" id="result"></div>
+</div>
+
+<script>
+// -------- Question Pool --------
+const questions=[
+  {
+    "q": "Which scholar famously argued that 'anarchy is mitigated by institutions' in the neoliberal tradition?",
+    "options": ["Kenneth Waltz", "Robert Keohane", "Alexander Wendt", "Hans Morgenthau"],
+    "answer": 1
+  },
+  {
+    "q": "Robert Keohane’s 'After Hegemony' (1984) primarily explores:",
+    "options": [
+      "How norms shape state identities",
+      "How cooperation can persist without hegemonic dominance",
+      "Why war is inevitable under anarchy",
+      "The moral limits of capitalism"
+    ],
+    "answer": 1
+  },
+  {
+    "q": "Which concept is central to the liberal argument that democracies rarely fight wars against each other?",
+    "options": [
+      "Balance of power theory",
+      "Democratic peace theory",
+      "World-systems theory",
+      "Security dilemma"
+    ],
+    "answer": 1
+  },
+  {
+    "q": "Which IR theorists developed the concept of 'complex interdependence'?",
+    "options": [
+      "Keohane and Nye",
+      "Mearsheimer and Walt",
+      "Hobson and Lenin",
+      "Bull and Watson"
+    ],
+    "answer": 0
+  },
+  {
+    "q": "According to neoliberal institutionalism, international regimes:",
+    "options": [
+      "Are irrelevant under anarchy",
+      "Reduce transaction costs and foster cooperation",
+      "Emerge only under hegemonic leadership",
+      "Eliminate state sovereignty"
+    ],
+    "answer": 1
+  },
+  {
+    "q": "Immanuel Kant’s 'Perpetual Peace' is often seen as a precursor to:",
+    "options": [
+      "Balance of terror",
+      "Democratic peace theory",
+      "Offensive realism",
+      "Constructivism"
+    ],
+    "answer": 1
+  },
+  {
+    "q": "The idea that international institutions create 'rules of the game' for states is most associated with:",
+    "options": [
+      "Realism",
+      "Constructivism",
+      "Neoliberal Institutionalism",
+      "Poststructuralism"
+    ],
+    "answer": 2
+  },
+  {
+    "q": "Which thinker argued that free trade promotes peace by creating mutual economic dependence?",
+    "options": ["David Ricardo", "Hans Morgenthau", "Robert Cox", "Kenneth Waltz"],
+    "answer": 0
+  },
+  {
+    "q": "Joseph Nye introduced which key concept into liberal IR theory?",
+    "options": ["Security dilemma", "Hegemonic stability", "Soft power", "Bandwagoning"],
+    "answer": 2
+  },
+  {
+    "q": "The 'shadow of the future' in neoliberal thought refers to:",
+    "options": [
+      "The inevitability of war",
+      "The expectation of repeated interactions encouraging cooperation",
+      "The decline of U.S. hegemony",
+      "The rise of non-state actors"
+    ],
+    "answer": 1
+  },
+  {
+    "q": "Which IR liberal theory emphasizes the role of domestic institutions in shaping foreign policy?",
+    "options": [
+      "Democratic peace theory",
+      "World-systems theory",
+      "Offensive realism",
+      "Critical theory"
+    ],
+    "answer": 0
+  },
+  {
+    "q": "According to liberals, absolute gains refer to:",
+    "options": [
+      "Relative advantages over rivals",
+      "Total benefits accruing to all states",
+      "Military superiority in power balancing",
+      "Territorial acquisitions after war"
+    ],
+    "answer": 1
+  },
+  {
+    "q": "Who argued that 'institutions matter because they lower the costs of cooperation'?",
+    "options": ["Kenneth Waltz", "Robert Keohane", "Alexander Wendt", "E.H. Carr"],
+    "answer": 1
+  },
+  {
+    "q": "Which historical figure’s 'Fourteen Points' speech embodied liberal principles in world politics?",
+    "options": ["Franklin Roosevelt", "Woodrow Wilson", "Winston Churchill", "Harry Truman"],
+    "answer": 1
+  },
+  {
+    "q": "The concept of 'functionalism' in liberal IR was developed to explain:",
+    "options": [
+      "Why states must balance power",
+      "How technical cooperation can spill over into political integration",
+      "The role of culture in shaping state identity",
+      "How revolutions alter world order"
+    ],
+    "answer": 1
+  },
+  {
+    "q": "Which of the following is NOT a key liberal assumption in IR theory?",
+    "options": [
+      "States are rational actors",
+      "States can achieve cooperation",
+      "Institutions help mitigate anarchy",
+      "Relative gains always dominate state behavior"
+    ],
+    "answer": 3
+  },
+  {
+    "q": "In neoliberal institutionalism, regimes are defined as:",
+    "options": [
+      "Military alliances based on balance of power",
+      "Principles, norms, rules, and decision-making procedures that govern international relations",
+      "Temporary coalitions against common threats",
+      "Cultural practices shaping worldviews"
+    ],
+    "answer": 1
+  },
+  {
+    "q": "Who among the following is most closely linked with the concept of 'hegemonic stability theory' within a liberal framework?",
+    "options": ["Robert Gilpin", "Immanuel Kant", "Kenneth Waltz", "Joseph Nye"],
+    "answer": 0
+  },
+  {
+    "q": "Liberals argue that intergovernmental organizations such as the UN function primarily to:",
+    "options": [
+      "Project hegemonic dominance",
+      "Provide collective security and cooperation frameworks",
+      "Enforce cultural uniformity",
+      "Undermine state sovereignty"
+    ],
+    "answer": 1
+  },
+  {
+    "q": "Which liberal theorist emphasized the role of international law in promoting order and cooperation?",
+    "options": ["Hans Kelsen", "Hugo Grotius", "Antonio Gramsci", "Carl Schmitt"],
+    "answer": 1
+  },
+];
+
+// -------- Variables --------
+let current=0;
+const userAnswers=Array(questions.length).fill(null);
+const flagged=Array(questions.length).fill(false);
+
+const questionContainer=document.getElementById('questionContainer');
+const navPanel=document.getElementById('navPanel');
+const prevBtn=document.getElementById('prevBtn');
+const nextBtn=document.getElementById('nextBtn');
+const submitBtn=document.getElementById('submitBtn');
+const flagBtn=document.getElementById('flagBtn');
+const resultDiv=document.getElementById('result');
+const progressBar=document.getElementById('progressBar');
+
+// -------- Timer --------
+let timeLeft=50*60; // corrected to 50 minutes
+const timerEl=document.getElementById('timer');
+const timerInterval=setInterval(()=>{
+  let m=Math.floor(timeLeft/60),s=timeLeft%60;
+  timerEl.textContent=`Time Left: ${m}:${s<10?'0':''}${s}`;
+  if(timeLeft<=60) timerEl.classList.add('warning');
+  timeLeft--;
+  if(timeLeft<0){clearInterval(timerInterval);submitQuiz();}
+},1000);
+
+// -------- Functions --------
+function renderNav(){
+  navPanel.innerHTML='';
+  questions.forEach((q,i)=>{
+    const btn=document.createElement('button');
+    btn.textContent=i+1;
+    btn.className= flagged[i] ? 'flagged' : (userAnswers[i]!==null?'answered':'unanswered');
+    if(i===current) btn.classList.add('current');
+    btn.onclick=()=>{current=i; renderQuestion();};
+    navPanel.appendChild(btn);
+  });
+  progressBar.style.width=`${(userAnswers.filter(a=>a!==null).length/questions.length)*100}%`;
+}
+
+function renderQuestion(){
+  const q=questions[current];
+  questionContainer.innerHTML=`<div class="question-card">${current+1}. ${q.q}<div class="options"></div></div>`;
+  const optionsDiv=questionContainer.querySelector('.options');
+  q.options.forEach((opt,j)=>{
+    optionsDiv.innerHTML+=`<label><input type="radio" name="q" value="${j}" ${userAnswers[current]===j?'checked':''}> ${opt}</label>`;
+  });
+  document.querySelectorAll('input[name="q"]').forEach(el=>{
+    el.onchange=()=>{userAnswers[current]=parseInt(el.value); renderNav();}
+  });
+  prevBtn.style.display=current===0?'none':'inline-block';
+  nextBtn.style.display=current===questions.length-1?'none':'inline-block';
+  submitBtn.style.display=current===questions.length-1?'inline-block':'none';
+  flagBtn.textContent=flagged[current]?'Unflag':'Flag / Unflag';
+  renderNav();
+}
+
+// -------- Button Actions --------
+prevBtn.onclick=()=>{current--; renderQuestion();}
+nextBtn.onclick=()=>{current++; renderQuestion();}
+flagBtn.onclick=()=>{flagged[current]=!flagged[current]; renderQuestion();}
+submitBtn.onclick=()=>submitQuiz();
+
+// -------- Submit Quiz --------
+function submitQuiz(){
+  clearInterval(timerInterval);
+  let score=0,report='';
+  questions.forEach((q,i)=>{
+    const user=userAnswers[i];
+    if(user===q.answer){score++; report+=`${i+1}. Correct${flagged[i]?' [Flagged]':''}<br>`;}
+    else{report+=`${i+1}. Incorrect (Correct: ${q.options[q.answer]})${flagged[i]?' [Flagged]':''}<br>`;}
+  });
+  questionContainer.innerHTML='';
+  navPanel.innerHTML='';
+  prevBtn.style.display='none';
+  nextBtn.style.display='none';
+  submitBtn.style.display='none';
+  flagBtn.style.display='none';
+  progressBar.style.width='100%';
+  resultDiv.innerHTML=`<h3>Your Score: ${score} / ${questions.length}</h3><br>${report}`;
+}
+
+// -------- Initial Render --------
+renderQuestion();
+</script>
+</body>
+</html>
