@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Public Administration - Advanced Quiz</title>
+<style>
+  body { font-family: Arial, sans-serif; background: #f4f6fb; margin:0; padding:0; }
+  header { background: #1a237e; color:#fff; padding:15px; text-align:center; }
+  .container { max-width: 900px; margin: 20px auto; background:#fff; border-radius:10px;
+    box-shadow:0 2px 6px rgba(0,0,0,0.1); padding:20px; position:relative; }
+  .timer { position:fixed; top:15px; right:15px; background:#1a237e; color:#fff;
+    padding:10px 15px; border-radius:6px; font-weight:bold; z-index:1000; }
+  .timer.warning { background:#e53935; }
+  .question-card { padding:20px; border-radius:8px; background:#f9f9f9; margin-bottom:20px;
+    transition: all 0.3s ease; }
+  .options label { display:block; margin:6px 0; padding:8px; border:1px solid #ddd; border-radius:6px;
+    cursor:pointer; transition: background 0.3s; }
+  .options input { margin-right:10px; }
+  .options label:hover { background:#f1f1f1; }
+  .nav-panel { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:20px; justify-content:center; }
+  .nav-panel button { padding:8px 12px; border:none; border-radius:6px; cursor:pointer; }
+  .nav-panel button.unanswered { background:#e0e0e0; }
+  .nav-panel button.answered { background:#1a237e; color:#fff; }
+  .nav-panel button.flagged { background:#ff9800; color:#fff; }
+  .nav-panel button.current { border:2px solid #ffeb3b; }
+  .actions { display:flex; justify-content:space-between; margin-top:15px; flex-wrap:wrap; gap:10px; }
+  button.action { background:#1a237e; color:#fff; border:none; padding:10px 20px; border-radius:6px; cursor:pointer; }
+  button.action:hover { background:#3949ab; }
+  button.flag-action { background:#ff9800; color:#fff; }
+  button.flag-action:hover { background:#e68900; }
+  .progress-container { width:100%; background:#ddd; border-radius:8px; margin-bottom:15px; }
+  .progress-bar { height:10px; background:#1a237e; width:0%; border-radius:8px; transition: width 0.3s; }
+  .result { margin-top:20px; font-weight:bold; color:#1a237e; }
+</style>
+</head>
+<body>
+
+<header>
+<h1>international relation</h1>
+<p>Answer all questions. Timer is running!</p>
+</header>
+
+<div class="timer" id="timer">Time Left: 50:00</div>
+
+<div class="container">
+<div class="progress-container"><div class="progress-bar" id="progressBar"></div></div>
+<div class="nav-panel" id="navPanel"></div>
+<div id="questionContainer"></div>
+
+<div class="actions">
+<button class="action" id="prevBtn">Previous</button>
+<button class="action" id="nextBtn">Next</button>
+<button class="flag-action" id="flagBtn">Flag / Unflag</button>
+<button class="action" id="submitBtn" style="display:none;">Submit Quiz</button>
+</div>
+
+<div class="result" id="result"></div>
+</div>
+
+<script>
+// -------- Question Pool --------
+const questions=[
+  {
+    "q": "Who is regarded as the father of modern International Relations as an academic discipline?",
+    "options": ["Hans Morgenthau", "E.H. Carr", "Woodrow Wilson", "Kenneth Waltz"],
+    "answer": 2
+  },
+  {
+    "q": "E.H. Carr’s 'Twenty Years’ Crisis' (1939) primarily critiqued which school of thought in International Relations?",
+    "options": ["Realism", "Idealism", "Constructivism", "Marxism"],
+    "answer": 1
+  },
+  {
+    "q": "Kenneth Waltz’s 'Theory of International Politics' (1979) laid the foundation of which theoretical approach?",
+    "options": ["Classical Realism", "Liberal Institutionalism", "Neorealism/Structural Realism", "English School"],
+    "answer": 2
+  },
+  {
+    "q": "The concept of 'Anarchy' in IR refers to:",
+    "options": ["Complete chaos in world politics", "Absence of central authority above states", "Disorder within domestic politics", "Rejection of sovereignty"],
+    "answer": 1
+  },
+  {
+    "q": "Who introduced the concept of 'Complex Interdependence' in IR theory?",
+    "options": ["Robert Keohane and Joseph Nye", "Hans Morgenthau", "Barry Buzan", "Karl Deutsch"],
+    "answer": 0
+  },
+  {
+    "q": "Which thinker is most associated with the 'Balance of Power' theory in classical realism?",
+    "options": ["Thucydides", "Niccolò Machiavelli", "Hans Morgenthau", "Kenneth Waltz"],
+    "answer": 2
+  },
+  {
+    "q": "The 'English School' of International Relations emphasizes:",
+    "options": ["World Systems Theory", "International Society", "Neoliberal Institutions", "Dependency Theory"],
+    "answer": 1
+  },
+  {
+    "q": "Immanuel Kant’s idea of 'Perpetual Peace' laid the groundwork for which tradition in IR?",
+    "options": ["Realism", "Liberalism", "Constructivism", "Post-Colonialism"],
+    "answer": 1
+  },
+  {
+    "q": "Who among the following is a key proponent of Constructivism in International Relations?",
+    "options": ["Alexander Wendt", "Robert Cox", "Kenneth Waltz", "Morton Kaplan"],
+    "answer": 0
+  },
+  {
+    "q": "Which theoretical approach argues 'anarchy is what states make of it'?",
+    "options": ["Realism", "Liberalism", "Constructivism", "Marxism"],
+    "answer": 2
+  },
+  {
+    "q": "Dependency Theory in IR emerged primarily from which region?",
+    "options": ["Western Europe", "North America", "Latin America", "East Asia"],
+    "answer": 2
+  },
+  {
+    "q": "World Systems Theory was developed by:",
+    "options": ["Robert Keohane", "Immanuel Wallerstein", "Andre Gunder Frank", "Samir Amin"],
+    "answer": 1
+  },
+  {
+    "q": "Which IR scholar is associated with the 'Power Transition Theory'?",
+    "options": ["A.F.K. Organski", "Morton Kaplan", "Hedley Bull", "Kenneth Waltz"],
+    "answer": 0
+  },
+  {
+    "q": "Who introduced the concept of 'Hegemonic Stability Theory'?",
+    "options": ["Robert Gilpin", "Charles Kindleberger", "Joseph Nye", "Barry Buzan"],
+    "answer": 1
+  },
+  {
+    "q": "Joseph Nye is best known for developing the concept of:",
+    "options": ["Hard Power", "Soft Power", "Structural Realism", "Security Dilemma"],
+    "answer": 1
+  },
+  {
+    "q": "The 'Security Dilemma' describes a situation in which:",
+    "options": ["States cooperate to reduce insecurity", "States’ defensive measures increase others’ insecurity", "States are protected by international law", "States abolish military forces"],
+    "answer": 1
+  },
+  {
+    "q": "Which IR theory focuses on gender and the marginalization of women in world politics?",
+    "options": ["Post-structuralism", "Feminist IR theory", "Critical Realism", "Constructivism"],
+    "answer": 1
+  },
+  {
+    "q": "The concept of 'Collective Security' was institutionalized first in:",
+    "options": ["Concert of Europe", "League of Nations", "United Nations", "NATO"],
+    "answer": 1
+  },
+  {
+    "q": "Which concept argues that democracies are less likely to go to war with one another?",
+    "options": ["Realpolitik", "Democratic Peace Theory", "Balance of Terror", "Power Transition Theory"],
+    "answer": 1
+  },
+  {
+    "q": "The 'Clash of Civilizations' thesis was advanced by:",
+    "options": ["Francis Fukuyama", "Samuel Huntington", "Edward Said", "Robert Kaplan"],
+    "answer": 1
+  },
+  
+  {
+    "q": "Which scholar argued that international politics is a struggle for power, famously writing 'Politics Among Nations' in 1948?",
+    "options": ["Hans Morgenthau", "Kenneth Waltz", "E.H. Carr", "Morton Kaplan"],
+    "answer": 0
+  },
+  {
+    "q": "The 'End of History' thesis, proposing liberal democracy as the final form of government, was advanced by:",
+    "options": ["Francis Fukuyama", "Samuel Huntington", "Robert Keohane", "Noam Chomsky"],
+    "answer": 0
+  },
+  {
+    "q": "Which approach in International Relations critiques the Eurocentric narratives embedded in mainstream theories?",
+    "options": ["Post-Colonialism", "Realism", "Neorealism", "Pluralism"],
+    "answer": 0
+  },
+  {
+    "q": "The term 'Mutually Assured Destruction' (MAD) is associated with which period?",
+    "options": ["World War I", "Cold War", "Interwar Years", "War on Terror"],
+    "answer": 1
+  },
+  {
+    "q": "The 1994 Human Development Report introduced which key concept into international policy discourse?",
+    "options": ["Collective Security", "Human Security", "Complex Interdependence", "Structural Violence"],
+    "answer": 1
+  },
+  {
+    "q": "Which of the following scholars is most associated with Critical Theory in International Relations?",
+    "options": ["Robert Cox", "Alexander Wendt", "Barry Buzan", "Graham Allison"],
+    "answer": 0
+  },
+  {
+    "q": "Which international relations theorist declared that 'theory is always for someone and for some purpose'?",
+    "options": ["Robert Cox", "Immanuel Wallerstein", "Susan Strange", "Stephen Krasner"],
+    "answer": 0
+  },
+  {
+    "q": "The 'Tragedy of Great Power Politics' (2001), advancing offensive realism, was written by:",
+    "options": ["John Mearsheimer", "Kenneth Waltz", "Hans Morgenthau", "Stephen Walt"],
+    "answer": 0
+  },
+  {
+    "q": "The concept of 'Power/Knowledge' in global politics is derived from the work of:",
+    "options": ["Michel Foucault", "Antonio Gramsci", "Edward Said", "Karl Marx"],
+    "answer": 0
+  },
+  {
+    "q": "Which event is widely seen as marking the beginning of the modern international system under the Westphalian order?",
+    "options": ["Treaty of Westphalia, 1648", "Congress of Vienna, 1815", "Treaty of Versailles, 1919", "Formation of the UN, 1945"],
+    "answer": 0
+  },
+
+  {
+    "q": "The 'Dependency School' in International Relations primarily critiques:",
+    "options": ["Capitalist global economy", "United Nations", "Nuclear proliferation", "Balance of Power theory"],
+    "answer": 0
+  },
+  {
+    "q": "Which organization was awarded the Nobel Peace Prize in 2012 for advancing peace and reconciliation?",
+    "options": ["ASEAN", "European Union", "African Union", "NATO"],
+    "answer": 1
+  },
+  {
+    "q": "Which term refers to the ability to shape the preferences of others through attraction and persuasion rather than coercion?",
+    "options": ["Hard Power", "Smart Power", "Soft Power", "Sharp Power"],
+    "answer": 2
+  },
+  {
+    "q": "Who argued that 'hegemonic stability' is necessary for maintaining an open international economic system?",
+    "options": ["Robert Keohane", "Charles Kindleberger", "Susan Strange", "Robert Gilpin"],
+    "answer": 1
+  },
+  {
+    "q": "Which doctrine justified US intervention in Latin America during the early 19th century?",
+    "options": ["Monroe Doctrine", "Truman Doctrine", "Bush Doctrine", "Nixon Doctrine"],
+    "answer": 0
+  },
+  {
+    "q": "The concept of 'Three Worlds' (First, Second, and Third) emerged prominently during:",
+    "options": ["Cold War", "World War I", "Post-Cold War", "League of Nations era"],
+    "answer": 0
+  },
+  {
+    "q": "The concept of 'World Risk Society' is attributed to:",
+    "options": ["Ulrich Beck", "Anthony Giddens", "Zygmunt Bauman", "David Held"],
+    "answer": 0
+  },
+  {
+    "q": "Which IR theory critiques the 'scientific' pretensions of mainstream theories and emphasizes discourse and language?",
+    "options": ["Post-structuralism", "Realism", "Neoliberalism", "Pluralism"],
+    "answer": 0
+  },
+  {
+    "q": "The 'Responsibility to Protect' (R2P) principle was formally endorsed at which UN event?",
+    "options": ["Millennium Summit 2000", "World Summit 2005", "Rio+20 Summit 2012", "Paris Climate Summit 2015"],
+    "answer": 1
+  },
+  {
+    "q": "Which scholar advanced the idea of 'zones of peace' in the international system?",
+    "options": ["Karl Deutsch", "Bruce Russett", "John Burton", "Barry Buzan"],
+    "answer": 1
+  },
+
+  {
+    "q": "Match the following scholars with their contributions:\n(a) Alexander Wendt\n(b) Kenneth Waltz\n(c) Robert Keohane\n(d) Samuel Huntington\n\n1. Clash of Civilizations\n2. Neorealism\n3. Neoliberal Institutionalism\n4. Social Constructivism",
+    "options": ["a-4, b-2, c-3, d-1", "a-3, b-4, c-2, d-1", "a-2, b-3, c-4, d-1", "a-1, b-2, c-3, d-4"],
+    "answer": 0
+  },
+  {
+    "q": "Which of the following institutions emerged from the Bretton Woods Conference of 1944?",
+    "options": ["IMF and World Bank", "United Nations", "WTO and NAFTA", "OECD"],
+    "answer": 0
+  },
+  {
+    "q": "Which UN Secretary-General introduced the idea of 'Agenda for Peace' in 1992?",
+    "options": ["Dag Hammarskjöld", "Boutros Boutros-Ghali", "Kofi Annan", "Ban Ki-moon"],
+    "answer": 1
+  },
+  {
+    "q": "Who is considered the intellectual architect of 'Neoliberal Institutionalism'?",
+    "options": ["Robert Keohane", "Stephen Krasner", "Joseph Nye", "Charles Kindleberger"],
+    "answer": 0
+  },
+  {
+    "q": "The concept of 'Grotian Tradition' in IR, emphasizing law and society among states, comes from which thinker?",
+    "options": ["Hugo Grotius", "Thomas Hobbes", "John Locke", "Jean Bodin"],
+    "answer": 0
+  },
+  {
+    "q": "Which IR approach studies how norms, identity, and ideas shape state behavior?",
+    "options": ["Constructivism", "Realism", "Liberalism", "Marxism"],
+    "answer": 0
+  },
+  {
+    "q": "The term 'Post-Truth Politics' became prominent in IR discourse after which global event?",
+    "options": ["Brexit Referendum (2016)", "World War II", "Cuban Missile Crisis", "Fall of Berlin Wall"],
+    "answer": 0
+  },
+  {
+    "q": "Which organization succeeded the General Agreement on Tariffs and Trade (GATT) in 1995?",
+    "options": ["OECD", "WTO", "NAFTA", "EU"],
+    "answer": 1
+  },
+  {
+    "q": "Which country’s foreign policy is often described by the concept of 'Gaullism'?",
+    "options": ["United Kingdom", "France", "Germany", "Italy"],
+    "answer": 1
+  },
+  {
+    "q": "Which IR theory critiques the dominance of Western, male, and elite perspectives in global politics?",
+    "options": ["Feminist IR", "Post-Colonialism", "Critical Realism", "English School"],
+    "answer": 0
+  },
+  {
+    "q": "Which among the following best explains the central argument of Morton Kaplan’s 'System Theory of International Politics'?",
+    "options": [
+      "States are rational, unitary actors in an anarchic international system",
+      "The international system can be understood through six models: Balance of Power, Loose Bipolar, Tight Bipolar, Universal, Hierarchical, and Unit Veto",
+      "Economic interdependence leads to cooperation in global politics",
+      "Ideas and norms shape state behavior more than material capabilities"
+    ],
+    "answer": 1
+  }
+];
+
+// -------- Variables --------
+let current=0;
+const userAnswers=Array(questions.length).fill(null);
+const flagged=Array(questions.length).fill(false);
+
+const questionContainer=document.getElementById('questionContainer');
+const navPanel=document.getElementById('navPanel');
+const prevBtn=document.getElementById('prevBtn');
+const nextBtn=document.getElementById('nextBtn');
+const submitBtn=document.getElementById('submitBtn');
+const flagBtn=document.getElementById('flagBtn');
+const resultDiv=document.getElementById('result');
+const progressBar=document.getElementById('progressBar');
+
+// -------- Timer --------
+let timeLeft=50*60; // corrected to 50 minutes
+const timerEl=document.getElementById('timer');
+const timerInterval=setInterval(()=>{
+  let m=Math.floor(timeLeft/60),s=timeLeft%60;
+  timerEl.textContent=`Time Left: ${m}:${s<10?'0':''}${s}`;
+  if(timeLeft<=60) timerEl.classList.add('warning');
+  timeLeft--;
+  if(timeLeft<0){clearInterval(timerInterval);submitQuiz();}
+},1000);
+
+// -------- Functions --------
+function renderNav(){
+  navPanel.innerHTML='';
+  questions.forEach((q,i)=>{
+    const btn=document.createElement('button');
+    btn.textContent=i+1;
+    btn.className= flagged[i] ? 'flagged' : (userAnswers[i]!==null?'answered':'unanswered');
+    if(i===current) btn.classList.add('current');
+    btn.onclick=()=>{current=i; renderQuestion();};
+    navPanel.appendChild(btn);
+  });
+  progressBar.style.width=`${(userAnswers.filter(a=>a!==null).length/questions.length)*100}%`;
+}
+
+function renderQuestion(){
+  const q=questions[current];
+  questionContainer.innerHTML=`<div class="question-card">${current+1}. ${q.q}<div class="options"></div></div>`;
+  const optionsDiv=questionContainer.querySelector('.options');
+  q.options.forEach((opt,j)=>{
+    optionsDiv.innerHTML+=`<label><input type="radio" name="q" value="${j}" ${userAnswers[current]===j?'checked':''}> ${opt}</label>`;
+  });
+  document.querySelectorAll('input[name="q"]').forEach(el=>{
+    el.onchange=()=>{userAnswers[current]=parseInt(el.value); renderNav();}
+  });
+  prevBtn.style.display=current===0?'none':'inline-block';
+  nextBtn.style.display=current===questions.length-1?'none':'inline-block';
+  submitBtn.style.display=current===questions.length-1?'inline-block':'none';
+  flagBtn.textContent=flagged[current]?'Unflag':'Flag / Unflag';
+  renderNav();
+}
+
+// -------- Button Actions --------
+prevBtn.onclick=()=>{current--; renderQuestion();}
+nextBtn.onclick=()=>{current++; renderQuestion();}
+flagBtn.onclick=()=>{flagged[current]=!flagged[current]; renderQuestion();}
+submitBtn.onclick=()=>submitQuiz();
+
+// -------- Submit Quiz --------
+function submitQuiz(){
+  clearInterval(timerInterval);
+  let score=0,report='';
+  questions.forEach((q,i)=>{
+    const user=userAnswers[i];
+    if(user===q.answer){score++; report+=`${i+1}. Correct${flagged[i]?' [Flagged]':''}<br>`;}
+    else{report+=`${i+1}. Incorrect (Correct: ${q.options[q.answer]})${flagged[i]?' [Flagged]':''}<br>`;}
+  });
+  questionContainer.innerHTML='';
+  navPanel.innerHTML='';
+  prevBtn.style.display='none';
+  nextBtn.style.display='none';
+  submitBtn.style.display='none';
+  flagBtn.style.display='none';
+  progressBar.style.width='100%';
+  resultDiv.innerHTML=`<h3>Your Score: ${score} / ${questions.length}</h3><br>${report}`;
+}
+
+// -------- Initial Render --------
+renderQuestion();
+</script>
+</body>
+</html>
