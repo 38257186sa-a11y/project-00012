@@ -1,0 +1,180 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Unit 1 — Teaching Aptitude (Quiz)</title>
+<style>
+  :root{--bg:#f4f6fb;--card:#fff;--accent:#0f4c81;--muted:#6b7280;--correct:#2e7d32;--wrong:#c62828}
+  body{font-family:Arial,Helvetica,sans-serif;background:var(--bg);margin:0;color:#0b2545}
+  header{background:linear-gradient(90deg,var(--accent),#2b6cb0);color:#fff;padding:18px;text-align:center}
+  .container{max-width:900px;margin:20px auto;background:var(--card);border-radius:10px;padding:18px;box-shadow:0 6px 20px rgba(11,22,39,0.06)}
+  .topbar{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+  h1{margin:0;font-size:20px}
+  .meta{color:var(--muted);font-size:13px}
+  .progress-container{width:100%;background:#eee;border-radius:8px;height:10px;margin:12px 0;overflow:hidden}
+  .progress-bar{height:10px;background:var(--accent);width:0%;transition:width 0.25s ease}
+  .nav-panel{display:flex;flex-wrap:wrap;gap:6px;margin:12px 0}
+  .nav-panel button{width:36px;height:36px;border-radius:6px;border:none;cursor:pointer;background:#e6eef8;color:var(--accent);font-weight:700}
+  .nav-panel button.answered{background:var(--accent);color:#fff}
+  .nav-panel button.flagged{background:#ff9800;color:#fff}
+  .nav-panel button.current{box-shadow:0 0 0 3px rgba(255,235,59,0.12);border:2px solid #ffeb3b}
+  .question-card{background:#fbfdff;padding:16px;border-radius:8px;border:1px solid #eef6ff;margin-bottom:12px}
+  .options label{display:block;padding:10px;border-radius:6px;border:1px solid #e6eef8;margin:8px 0;cursor:pointer}
+  .options input{margin-right:10px}
+  .actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+  .btn{background:var(--accent);color:#fff;border:none;padding:10px 14px;border-radius:8px;cursor:pointer}
+  .btn.secondary{background:#e6eef8;color:var(--accent)}
+  .btn.flag{background:#ff9800}
+  .result{margin-top:14px;padding:12px;border-radius:8px;background:#fbfdff;border:1px dashed #e3eefc}
+  .answer-correct{color:var(--correct);font-weight:700}
+  .answer-wrong{color:var(--wrong);font-weight:700}
+  .review .options label.correct{outline:2px solid rgba(46,125,50,0.15);background:#e8f5e9}
+  .review .options label.wrong{outline:2px solid rgba(198,40,40,0.12);background:#fff1f0}
+  @media (max-width:700px){.nav-panel button{width:30px;height:30px}}
+</style>
+</head>
+<body>
+<header>
+  <div class="container">
+    <div class="topbar">
+      <div>
+        <h1>Unit 1 — Teaching Aptitude (Quiz)</h1>
+        <div class="meta">10 multiple-choice questions — no timer. Flag questions, navigate freely, submit when ready.</div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main class="container" id="app">
+  <div class="progress-container"><div class="progress-bar" id="progressBar"></div></div>
+
+  <div class="nav-panel" id="navPanel"></div>
+
+  <div id="questionContainer"></div>
+
+  <div class="actions" style="margin-top:12px">
+    <button class="btn secondary" id="prevBtn">Previous</button>
+    <button class="btn secondary" id="nextBtn">Next</button>
+    <button class="btn flag" id="flagBtn">Flag / Unflag</button>
+    <button class="btn" id="submitBtn">Submit Quiz</button>
+  </div>
+
+  <div id="result" class="result" style="display:none"></div>
+</main>
+
+<script>
+// Questions for Unit 1: Teaching Aptitude (10 MCQs)
+const questions = [
+  { q: "Which of the following is an example of formative assessment?", options: ["End-of-term examination","Diagnostic pre-test only","Daily quiz with feedback","University entrance exam"], answer: 2 },
+  { q: "Bloom's taxonomy classifies cognitive skills. Which level is the highest?", options: ["Apply","Analyze","Evaluate","Remember"], answer: 2 },
+  { q: "Constructivist teaching primarily emphasises:", options: ["Memorization of facts","Teacher-centered lectures","Learner constructing knowledge through experience","Standardized testing"], answer: 2 },
+  { q: "Which method best promotes collaborative learning?", options: ["Lecture","Group project","Individual assignment","Timed written test"], answer: 1 },
+  { q: "A clear learning objective should be:", options: ["Vague and open-ended","Measurable and observable","Long and detailed","Hidden from students"], answer: 1 },
+  { q: "Which strategy helps manage a mixed-ability classroom?", options: ["Teach only to the top students","Use differentiated instruction","Ignore slower learners","Give everyone the same task without support"], answer: 1 },
+  { q: "Summative assessment is primarily used for:", options: ["Providing ongoing feedback","Grading and evaluating learning outcomes","Diagnosing misconceptions before instruction","Informal peer feedback"], answer: 1 },
+  { q: "Which of the following is NOT a component of lesson planning?", options: ["Learning outcomes","Assessment methods","Materials and resources","Students' home addresses"], answer: 3 },
+  { q: "Inclusive education means:", options: ["Separating students by ability","Ensuring all students participate and have access to learning","Lowering standards for everyone","Teaching only mainstream culture"], answer: 1 },
+  { q: "Feedback that guides future improvement is called:", options: ["Summative feedback","Descriptive feedback","Praise-only feedback","Administrative feedback"], answer: 1 }
+];
+
+let current = 0;
+const userAnswers = Array(questions.length).fill(null);
+const flagged = Array(questions.length).fill(false);
+
+const questionContainer = document.getElementById('questionContainer');
+const navPanel = document.getElementById('navPanel');
+const prevBtn = document.getElementById('prevBtn');
+const nextBtn = document.getElementById('nextBtn');
+const submitBtn = document.getElementById('submitBtn');
+const flagBtn = document.getElementById('flagBtn');
+const resultDiv = document.getElementById('result');
+const progressBar = document.getElementById('progressBar');
+
+function renderNav(){
+  navPanel.innerHTML='';
+  questions.forEach((q,i)=>{
+    const btn = document.createElement('button');
+    btn.textContent = i+1;
+    btn.className = '';
+    if(flagged[i]) btn.classList.add('flagged');
+    else if(userAnswers[i] !== null) btn.classList.add('answered');
+    if(i===current) btn.classList.add('current');
+    btn.onclick = ()=>{ current = i; renderQuestion(); };
+    navPanel.appendChild(btn);
+  });
+  const answeredCount = userAnswers.filter(a=>a!==null).length;
+  progressBar.style.width = `${(answeredCount/questions.length)*100}%`;
+}
+
+function renderQuestion(){
+  const q = questions[current];
+  questionContainer.innerHTML = `
+    <div class="question-card" id="qcard">
+      <div style="font-weight:700;margin-bottom:8px">${current+1}. ${q.q}</div>
+      <div class="options" id="opts"></div>
+    </div>
+  `;
+  const optsDiv = document.getElementById('opts');
+  q.options.forEach((opt,j)=>{
+    const id = 'q'+current+'o'+j;
+    const label = document.createElement('label');
+    label.innerHTML = `<input type="radio" name="q" value="${j}" id="${id}" ${userAnswers[current]===j?'checked':''}> ${opt}`;
+    optsDiv.appendChild(label);
+    label.querySelector('input').onchange = (e)=>{
+      userAnswers[current] = parseInt(e.target.value);
+      renderNav();
+    };
+  });
+  prevBtn.style.display = current===0 ? 'none' : 'inline-block';
+  nextBtn.style.display = current===questions.length-1 ? 'none' : 'inline-block';
+  flagBtn.textContent = flagged[current] ? 'Unflag' : 'Flag / Unflag';
+  renderNav();
+}
+
+prevBtn.onclick = ()=>{ if(current>0){ current--; renderQuestion(); } };
+nextBtn.onclick = ()=>{ if(current<questions.length-1){ current++; renderQuestion(); } };
+flagBtn.onclick = ()=>{ flagged[current] = !flagged[current]; renderQuestion(); };
+
+submitBtn.onclick = ()=>{ submitQuiz(); };
+
+function submitQuiz(){
+  // Show results and review mode
+  let score = 0;
+  let reportHtml = '';
+  questions.forEach((q,i)=>{
+    const ua = userAnswers[i];
+    const correct = q.answer;
+    const isCorrect = ua === correct;
+    if(isCorrect) score++;
+    const flaggedMark = flagged[i] ? ' <strong>[Flagged]</strong>' : '';
+    // prepare individual question display in review
+    reportHtml += `<div class="question-card review">`;
+    reportHtml += `<div style="font-weight:700;">${i+1}. ${q.q} ${flaggedMark}</div>`;
+    reportHtml += `<div class="options">`;
+    q.options.forEach((opt,j)=>{
+      const classes = [];
+      if(j===correct) classes.push('correct');
+      if(ua===j && j!==correct) classes.push('wrong');
+      const cls = classes.join(' ');
+      reportHtml += `<label class="${cls}" style="display:block;padding:8px;margin:6px 0;border-radius:6px;border:1px solid #eef6ff;background:#fff">${opt}`;
+      if(j===correct) reportHtml += ` <span style="font-weight:700;color:var(--correct)"> (Correct)</span>`;
+      if(ua===j && j!==correct) reportHtml += ` <span style="font-weight:700;color:var(--wrong)"> (Your answer)</span>`;
+      reportHtml += `</label>`;
+    });
+    reportHtml += `</div></div>`;
+  });
+  questionContainer.innerHTML = `<div style="font-weight:800;margin-bottom:8px">Your Score: ${score} / ${questions.length} (${((score/questions.length)*100).toFixed(1)}%)</div>` + reportHtml;
+  // hide controls
+  prevBtn.style.display='none'; nextBtn.style.display='none'; flagBtn.style.display='none'; submitBtn.style.display='none';
+  resultDiv.style.display='block';
+  resultDiv.innerHTML = `<div style="font-weight:700">Quiz completed — review below. Correct answers are highlighted in green; incorrect selections in red.</div>`;
+  progressBar.style.width = '100%';
+  // scroll to top
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+renderQuestion();
+</script>
+</body>
+</html>
